@@ -4,6 +4,7 @@ import { TrackballControls } from 'TrackballControls'; // importation de l'addon
 import { FlyControls } from 'FlyControls';
 import { FirstPersonControls } from 'FirstPersonControls';
 import { conwayStructure } from './conway_structures/index.js'
+import { fancySnowflake } from './fancy_snowflakes/index.js'
 
 // BASIC SETUP
 
@@ -43,12 +44,26 @@ const groundMesh = new THREE.Mesh(ground, groundMaterial)
 groundMesh.receiveShadow = true;
 groundMesh.rotation.x = -Math.PI / 2
 scene.add(groundMesh)
+
+// CONWAY STRUCTURES
 conwayStructure.position.y += 50
 scene.add(conwayStructure)
 const conwayStructure2 = conwayStructure.clone()
 conwayStructure2.position.x = -50
 conwayStructure2.position.z = -30
 scene.add(conwayStructure2)
+
+// FANCY SNOWFLAKES
+for (let i = 0; i < 100; i++) {
+    const snowflake = fancySnowflake.clone()
+    snowflake.position.x += (Math.random() * 100) - 50
+    snowflake.position.z += (Math.random() * 100) - 50
+    snowflake.position.y += Math.random() * 60
+    snowflake.rotation.x += Math.random() * 100
+    snowflake.rotation.z += Math.random() * 100
+    snowflake.rotation.y += Math.random() * 100
+    scene.add(snowflake)
+}
 
 // ----------------------------------------------------------------
 
