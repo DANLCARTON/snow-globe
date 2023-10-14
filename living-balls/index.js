@@ -5,51 +5,8 @@ import { FlyControls } from 'FlyControls';
 import { FirstPersonControls } from 'FirstPersonControls';
 import { random3 } from "./max.js"
 
-// BASIC SETUP
-// définition de la scene et de la caméra
-// const scene = new THREE.Scene();
-// const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1100000);
-// camera.position.y = 5
-// const renderer = new THREE.WebGLRenderer();
-// renderer.shadowMap.enabled = true;
-// renderer.shadowMap.type = THREE.PCFSoftShadowMap
-// renderer.setSize(window.innerWidth, window.innerHeight);
-// document.body.appendChild(renderer.domElement);
-// lumières
-
-// function getRandomColor() {
-//     return Math.random() * 0xffffff;
-// }
-
-// scene.add(new THREE.AmbientLight(getRandomColor(), 1))
-
-// const point1 = new THREE.PointLight(getRandomColor(), 200)
-// point1.position.set(0, 2.5, 0)
-// point1.castShadow = true
-// scene.add(point1)
-
-// définition des contrôles de la caméra
-// const controls = new OrbitControls(camera, renderer.domElement);
-// scene.add(camera)
-
 // VARIABLES
 let globalBallId = 0;
-
-// PARAMS
-// const urlParams = new URLSearchParams(window.location.search)
-
-// let URL_START_POPULATION = urlParams.get("pop")
-// let URL_AREA = urlParams.get("area")
-// let URL_SEX_DISTRIBUTION = urlParams.get("sexDistrib")
-// let URL_MINIMUM_ATTRACTIVENESS_NECESSARY = urlParams.get("man")
-// let URL_ATTRACTIVENESS_BOOST = urlParams.get("aBoost")
-
-
-// const startPopulation = URL_START_POPULATION
-// const area = URL_AREA
-// const sexDistrib = URL_SEX_DISTRIBUTION
-// const minAttractivenessNecessary = URL_MINIMUM_ATTRACTIVENESS_NECESSARY
-// const attractivenessBoost = URL_ATTRACTIVENESS_BOOST
 
 const startPopulation = 50
 const area = 100
@@ -57,28 +14,6 @@ const sexDistrib = 0.48
 const minAttractivenessNecessary = 0.4
 const attractivenessBoost = 0.001
 
-
-
-
-
-
-
-
-
-
-// ACTUAL CODE
-// ----------------------------------------------------------------
-
-// GLOBAL ELEMENTS DEF
-// const plane = new THREE.PlaneGeometry(area, area)
-// const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x353535 })
-// const ground = new THREE.Mesh(plane, groundMaterial)
-// ground.receiveShadow = true;
-// ground.rotation.x = -Math.PI / 2
-// scene.add(ground)
-
-// const sphere = new THREE.SphereGeometry(.2, 8, 8);
-// const sphereMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
 const attractivenessMaterial = new THREE.MeshPhongMaterial({ color: 0xffdddd })
 const strengthMaterial = new THREE.MeshPhongMaterial({ color: 0xddffdd })
 const basicMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff })
@@ -237,13 +172,6 @@ function moveSpheres(spheres) {
     }
 }
 
-// function drawSpheres(spheres) {
-//     for (let i = 0; i < spheres.length; i++) {
-//         let sphere = spheres[i];
-//         sphere.mesh.position.copy(sphere.pos);
-//     }
-// }
-
 function checkCollisions(spheres, scene) {
     for (let i = 0; i < spheres.length; i++) {
         for (let j = 0; j < spheres.length; j++) {
@@ -267,37 +195,6 @@ function checkCollisions(spheres, scene) {
     return spheres
 }
 
-// LE CODE
-// let spheres = []
-
-// for (let i = 0; i < startPopulation; i++) {
-//     spheres.push(generateSphere(Math.random() <= sexDistrib ? "M" : "F", random3(), random3(), random3()))
-// }
-
-
 // ------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-// HELPERS
-// scene.add(new THREE.PointLightHelper(point1, 1))
-
-// LOOP
-// function animate() {
-//     requestAnimationFrame(animate);
-//     controls.update();
-//     moveSpheres()
-//     spheres = checkCollisions();
-//     drawSpheres()
-//     renderer.render(scene, camera);
-// }
-
-// animate();
 
 export { moveSpheres, checkCollisions, generateSphere }
