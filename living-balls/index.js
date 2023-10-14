@@ -8,18 +8,18 @@ import { random3 } from "./max.js"
 // BASIC SETUP
 // définition de la scene et de la caméra
 // const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1100000);
-camera.position.y = 5
-const renderer = new THREE.WebGLRenderer();
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+// const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1100000);
+// camera.position.y = 5
+// const renderer = new THREE.WebGLRenderer();
+// renderer.shadowMap.enabled = true;
+// renderer.shadowMap.type = THREE.PCFSoftShadowMap
+// renderer.setSize(window.innerWidth, window.innerHeight);
+// document.body.appendChild(renderer.domElement);
 // lumières
 
-function getRandomColor() {
-    return Math.random() * 0xffffff;
-}
+// function getRandomColor() {
+//     return Math.random() * 0xffffff;
+// }
 
 // scene.add(new THREE.AmbientLight(getRandomColor(), 1))
 
