@@ -5,6 +5,7 @@ import { FlyControls } from 'FlyControls';
 import { FirstPersonControls } from 'FirstPersonControls';
 import { conwayStructure } from './conway_structures/index.js'
 import { fancySnowflake } from './fancy_snowflakes/index.js'
+import { lUrban } from "./l-urban/index.js";
 
 // BASIC SETUP
 
@@ -54,7 +55,7 @@ conwayStructure2.position.z = -30
 scene.add(conwayStructure2)
 
 // FANCY SNOWFLAKES
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 200; i++) {
     const snowflake = fancySnowflake.clone()
     snowflake.position.x += (Math.random() * 100) - 50
     snowflake.position.z += (Math.random() * 100) - 50
@@ -64,6 +65,10 @@ for (let i = 0; i < 100; i++) {
     snowflake.rotation.y += Math.random() * 100
     scene.add(snowflake)
 }
+
+// L-URBAN
+lUrban.position.y += .1
+scene.add(lUrban)
 
 // ----------------------------------------------------------------
 
