@@ -7,7 +7,7 @@ import { random3 } from "./max.js"
 
 // BASIC SETUP
 // définition de la scene et de la caméra
-const scene = new THREE.Scene();
+// const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1100000);
 camera.position.y = 5
 const renderer = new THREE.WebGLRenderer();
@@ -21,36 +21,41 @@ function getRandomColor() {
     return Math.random() * 0xffffff;
 }
 
-scene.add(new THREE.AmbientLight(getRandomColor(), 1))
+// scene.add(new THREE.AmbientLight(getRandomColor(), 1))
 
-const point1 = new THREE.PointLight(getRandomColor(), 200)
-point1.position.set(0, 2.5, 0)
-point1.castShadow = true
-scene.add(point1)
+// const point1 = new THREE.PointLight(getRandomColor(), 200)
+// point1.position.set(0, 2.5, 0)
+// point1.castShadow = true
+// scene.add(point1)
 
 // définition des contrôles de la caméra
-const controls = new OrbitControls(camera, renderer.domElement);
-scene.add(camera)
+// const controls = new OrbitControls(camera, renderer.domElement);
+// scene.add(camera)
 
 // VARIABLES
 let globalBallId = 0;
 
 // PARAMS
-const urlParams = new URLSearchParams(window.location.search)
+// const urlParams = new URLSearchParams(window.location.search)
 
-let URL_START_POPULATION = urlParams.get("pop")
-let URL_AREA = urlParams.get("area")
-let URL_SEX_DISTRIBUTION = urlParams.get("sexDistrib")
-let URL_MINIMUM_ATTRACTIVENESS_NECESSARY = urlParams.get("man")
-let URL_ATTRACTIVENESS_BOOST = urlParams.get("aBoost")
+// let URL_START_POPULATION = urlParams.get("pop")
+// let URL_AREA = urlParams.get("area")
+// let URL_SEX_DISTRIBUTION = urlParams.get("sexDistrib")
+// let URL_MINIMUM_ATTRACTIVENESS_NECESSARY = urlParams.get("man")
+// let URL_ATTRACTIVENESS_BOOST = urlParams.get("aBoost")
 
 
-const startPopulation = URL_START_POPULATION
-const area = URL_AREA
-const sexDistrib = URL_SEX_DISTRIBUTION
-const minAttractivenessNecessary = URL_MINIMUM_ATTRACTIVENESS_NECESSARY
-const attractivenessBoost = URL_ATTRACTIVENESS_BOOST
+// const startPopulation = URL_START_POPULATION
+// const area = URL_AREA
+// const sexDistrib = URL_SEX_DISTRIBUTION
+// const minAttractivenessNecessary = URL_MINIMUM_ATTRACTIVENESS_NECESSARY
+// const attractivenessBoost = URL_ATTRACTIVENESS_BOOST
 
+const startPopulation = 50
+const area = 100
+const sexDistrib = 0.48
+const minAttractivenessNecessary = 0.4
+const attractivenessBoost = 0.001
 
 
 
@@ -65,12 +70,12 @@ const attractivenessBoost = URL_ATTRACTIVENESS_BOOST
 // ----------------------------------------------------------------
 
 // GLOBAL ELEMENTS DEF
-const plane = new THREE.PlaneGeometry(area, area)
-const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x353535 })
-const ground = new THREE.Mesh(plane, groundMaterial)
-ground.receiveShadow = true;
-ground.rotation.x = -Math.PI / 2
-scene.add(ground)
+// const plane = new THREE.PlaneGeometry(area, area)
+// const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x353535 })
+// const ground = new THREE.Mesh(plane, groundMaterial)
+// ground.receiveShadow = true;
+// ground.rotation.x = -Math.PI / 2
+// scene.add(ground)
 
 // const sphere = new THREE.SphereGeometry(.2, 8, 8);
 // const sphereMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
@@ -96,9 +101,9 @@ class Ball {
 }
 
 // FUNCTION DEF
-const generateSphere = (sex, attractiveness, strength, speed) => {
+const generateSphere = (sex, attractiveness, strength, speed, scene) => {
     const ball = new Ball(
-        new THREE.Vector3(Math.random() * 10 - 5, .2, Math.random() * 10 - 5),
+        new THREE.Vector3(Math.random() * 100 - 50, .2, Math.random() * 100 - 50),
         Math.random() * (2 * Math.PI),
         undefined,
         sex,
@@ -106,6 +111,8 @@ const generateSphere = (sex, attractiveness, strength, speed) => {
         strength,
         speed
     )
+
+    console.log("1", ball.pos)
 
     ball.mesh = new THREE.Mesh(new THREE.SphereGeometry(ball.strength / 4 + .2, 8, 8), strengthMaterial)
 
@@ -131,7 +138,7 @@ const generateSphere = (sex, attractiveness, strength, speed) => {
     return ball
 }
 
-const crossover = (super1, super2) => {
+const crossover = (super1, super2, scene, spheres) => {
     const kid1Stats = {
         attractiveness: random3() < .5 ? super1.attractiveness : super2.attractiveness,
         strength: random3() < .5 ? super1.strength : super2.strength,
@@ -153,8 +160,8 @@ const crossover = (super1, super2) => {
     if (kid1Stats.speed == super1.speed) kid2Stats.speed = super2.speed
     else kid2Stats.speed = super1.speed
 
-    let kid1 = generateSphere(Math.random() <= sexDistrib ? "M" : "F", kid1Stats.attractiveness, kid1Stats.strength, kid1Stats.speed)
-    let kid2 = generateSphere(Math.random() <= sexDistrib ? "M" : "F", kid2Stats.attractiveness, kid2Stats.strength, kid2Stats.speed)
+    let kid1 = generateSphere(Math.random() <= sexDistrib ? "M" : "F", kid1Stats.attractiveness, kid1Stats.strength, kid1Stats.speed, scene)
+    let kid2 = generateSphere(Math.random() <= sexDistrib ? "M" : "F", kid2Stats.attractiveness, kid2Stats.strength, kid2Stats.speed, scene)
 
     Math.floor(Math.random()) < .5 ? mutation(kid1) : mutation(kid2)
 
@@ -162,7 +169,7 @@ const crossover = (super1, super2) => {
     spheres.push(kid2)
 }
 
-const fight = (ball1, ball2, index1, index2) => {
+const fight = (ball1, ball2, index1, index2, scene, spheres) => {
     if (ball1.strength > ball2.strength) {
         spheres.splice(index2, 1)
         scene.remove(ball2.mesh)
@@ -189,11 +196,11 @@ const mutation = (kid) => {
     else if (statIndex == 2) kid.speed = random3()
 }
 
-const meet = (ball1, ball2, index1, index2) => {
+const meet = (ball1, ball2, index1, index2, scene, spheres) => {
 
     if (ball1.sex != ball2.sex) {
         if (Math.abs(ball1.attractiveness - ball2.attractiveness) <= minAttractivenessNecessary) { // ok mais je pense que là il faudrait utiliser tous les paramètres : attractivité, force et vitesse, pas juste l'attractivité. En gros vraaiment calculer un fitness à partir de tout ça | mais sinon ça marche
-            crossover(ball1, ball2)
+            crossover(ball1, ball2, scene, spheres)
             if (ball1.sex == "F") {
                 scene.remove(ball1.mesh)
                 spheres.splice(index1, 1)
@@ -205,16 +212,17 @@ const meet = (ball1, ball2, index1, index2) => {
             console.log("👨‍🦯", ball1.id, "&", ball2.id, "won't mate")
         }
     } else if (ball1.sex == "M" && ball2.sex == "M") {
-        fight(ball1, ball2, index1, index2)
+        fight(ball1, ball2, index1, index2, scene, spheres)
     } else if (ball1.sex == "F" && ball2.sex == "F") {
         enhanceAttractiveness(ball1, ball2)
     }
 }
 
-function moveSpheres() {
+function moveSpheres(spheres) {
+    // console.log(spheres)
     for (let i = 0; i < spheres.length; i++) {
         const ball = spheres[i];
-        const speed = ball.speed / 50 + 0.01;
+        const speed = ball.speed / 10 + 0.01;
         ball.pos.x += Math.cos(ball.angle) * speed;
         ball.pos.z += Math.sin(ball.angle) * speed;
 
@@ -229,14 +237,14 @@ function moveSpheres() {
     }
 }
 
-function drawSpheres() {
-    for (let i = 0; i < spheres.length; i++) {
-        let sphere = spheres[i];
-        sphere.mesh.position.copy(sphere.pos);
-    }
-}
+// function drawSpheres(spheres) {
+//     for (let i = 0; i < spheres.length; i++) {
+//         let sphere = spheres[i];
+//         sphere.mesh.position.copy(sphere.pos);
+//     }
+// }
 
-function checkCollisions() {
+function checkCollisions(spheres, scene) {
     for (let i = 0; i < spheres.length; i++) {
         for (let j = 0; j < spheres.length; j++) {
             if (i != j) {
@@ -247,7 +255,7 @@ function checkCollisions() {
                 const sumRadii = ball1.mesh.geometry.parameters.radius + ball2.mesh.geometry.parameters.radius;
 
                 if (distance < sumRadii) {
-                    meet(ball1, ball2, i, j)
+                    meet(ball1, ball2, i, j, scene, spheres)
                     return spheres
                 }
                 if (distance > sumRadii) {
@@ -260,11 +268,11 @@ function checkCollisions() {
 }
 
 // LE CODE
-let spheres = []
+// let spheres = []
 
-for (let i = 0; i < startPopulation; i++) {
-    spheres.push(generateSphere(Math.random() <= sexDistrib ? "M" : "F", random3(), random3(), random3()))
-}
+// for (let i = 0; i < startPopulation; i++) {
+//     spheres.push(generateSphere(Math.random() <= sexDistrib ? "M" : "F", random3(), random3(), random3()))
+// }
 
 
 // ------------------------------------------------------------------------------------------------
@@ -278,17 +286,18 @@ for (let i = 0; i < startPopulation; i++) {
 
 
 // HELPERS
-scene.add(new THREE.PointLightHelper(point1, 1))
+// scene.add(new THREE.PointLightHelper(point1, 1))
 
 // LOOP
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    moveSpheres()
-    spheres = checkCollisions();
+// function animate() {
+//     requestAnimationFrame(animate);
+//     controls.update();
+//     moveSpheres()
+//     spheres = checkCollisions();
+//     drawSpheres()
+//     renderer.render(scene, camera);
+// }
 
-    drawSpheres()
-    renderer.render(scene, camera);
-}
+// animate();
 
-animate();
+export { moveSpheres, checkCollisions, generateSphere }

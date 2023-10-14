@@ -175,8 +175,4 @@ axiomArray.map((letter) => {
 
 drawAllPlanes()
 
-scene.add(lUrban)
-
-animate();
-
 export { lUrban }
