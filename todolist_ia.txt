@@ -1,0 +1,22 @@
+URGENT
+- voir la taille des trucs dessus
+
+A FAIRE
+- Routes WFC pour placer les bâtiments
+https://www.boristhebrave.com/2020/02/08/wave-function-collapse-tips-and-tricks/
+- Neuroévolution
+- Textures
+- Chaine de Markov (nuages avec les fractales, pluie petit mesh de merde, neige fractales, éclairs à voir peut-être l-system)
+
+SI ON A LE TEMPS
+- Vent
+- Physique bouger la boule
+- donner un design particuler pour les persos
+- collisions avec les bâtiments
+- mettre des dorures sur le cylindre
+- faire rentrer les persos dans les bâtiments quand il pleut (ça se fait, c'est rigolo utiliser le fitness, faire des abris)
+- si il y a un éclair ils se figent puis il repartent
+
+A FAIRE POUR LA SEMAINE PRO
+- WFC on va essayer
+- Chaine de Markov météo

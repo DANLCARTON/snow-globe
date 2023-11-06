@@ -53,7 +53,7 @@ const domeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, opacity:.5, t
 const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
-// CONWAY STRUCTURES
+// // CONWAY STRUCTURES
 // conwayStructure.position.y += 50
 // scene.add(conwayStructure)
 // const conwayStructure2 = conwayStructure.clone()
