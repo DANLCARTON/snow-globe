@@ -43,6 +43,10 @@ const drawAllPlanes = () => {
     }
 }
 
+const distanceToCenter = (x, z) => {
+    return Math.sqrt(x*x + z*z)
+}
+
 // importation et paramétrage de la texture de route
 const texture = new THREE.TextureLoader().load("./l-urban/texture2.jpg");
 texture.wrapS = THREE.RepeatWrapping;
@@ -141,6 +145,10 @@ var y = 0; // hauteur sur l'axe y reste tout le temps à 0
 axiomArray.map((letter) => {
     var currentAngle = angles[dir]
     if (letter == "F") {
+        if (distanceToCenter(x + currentAngle.x, z + currentAngle.z) > 50) {
+            dir = (dir+4).mod(8)
+            currentAngle = angles[dir]
+        }
         x += currentAngle.x; // avance
         z += currentAngle.z;
         p += 1 // on passe au point suivant
