@@ -145,8 +145,8 @@ layers.map((layer) => {
             if (layer[x][z] == 1) {
                 const cube = new THREE.Mesh(geometry, material)
                 cube.position.set(x, y, z);
-                cube.castShadow = true;
-                cube.receiveShadow = true
+                cube.castShadow = false;
+                cube.receiveShadow = false
                 conwayStructure.add(cube)
             }
         }

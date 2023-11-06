@@ -8,17 +8,39 @@ import { random3 } from "./max.js"
 // VARIABLES
 let globalBallId = 0;
 
-const startPopulation = 50
-const area = 100
+const area = 25
 const sexDistrib = 0.48
 const minAttractivenessNecessary = 0.4
 const attractivenessBoost = 0.001
+const maxSpeed = 2
+const minSpeed = 0.1
+
 
 const attractivenessMaterial = new THREE.MeshPhongMaterial({ color: 0xffdddd })
 const strengthMaterial = new THREE.MeshPhongMaterial({ color: 0xddffdd })
 const basicMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff })
 const maleGeometry = new THREE.BoxGeometry(.4, .4, .4)
 const femaleGeometry = new THREE.SphereGeometry(.2, 8, 8)
+
+class NN {
+    // constructor(ni, w, no, nh, nhw) {
+    constructor(ni, w, no) {
+        this.ni = ni // neurones entrée
+        this.w = w // poids neurones || a faire : des poids différents pour no0 et no1
+        this.no = no // neurones sortie
+    }
+    sumFuncNO = () => {
+        for (let i = 0; i < this.no.length; i++) {
+            this.no[i] = 0;
+            for (let j = 0; j < this.ni.length; j++) {
+                for (let k = 0; k < this.w[j].length ; k++) {
+                    this.no[j] += this.ni[j]*this.w[j][k]
+                }
+                
+            }
+        }
+    }
+}
 
 // CLASS DEF
 class Ball {
@@ -32,13 +54,37 @@ class Ball {
         this.attractiveness = attractiveness
         this.strength = strength
         this.speed = speed
+        this.nn = new NN(
+            [0, 0, 0], // neurones d'entrée
+            [[(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], 
+            [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], 
+            [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1]], // poids des neurones d'entrée
+            [0, 0] // neurones de sortie
+            // 5, // nombre de neurones cachés
+            // [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1] // poids des neurones cachés
+        )
     }
+    distance = (oBall) => {
+        return this.pos.distanceTo(oBall.pos)
+    }
+    relativeSpeed = (oBall) => {
+        let thisVelocity = new THREE.Vector2(Math.cos(this.angle), Math.sin(this.angle)).multiplyScalar(this.speed)
+        let oBallVelocity = new THREE.Vector2(Math.cos(oBall.angle), Math.sin(oBall.angle)).multiplyScalar(oBall.speed)
+        let relativeVelocity = thisVelocity.clone().sub(oBallVelocity)
+        let dotProduct = relativeVelocity.dot(this.pos.clone().sub(oBall.pos))
+        if (dotProduct < 0) return -relativeVelocity.length()
+        else return relativeVelocity.length()
+    }
+    sexualityOf = (oBall) => {
+        if (oBall.sex == "F") return 1
+        else if (oBall.sex == "M") return -1
+    } 
 }
 
 // FUNCTION DEF
 const generateSphere = (sex, attractiveness, strength, speed, scene) => {
     const ball = new Ball(
-        new THREE.Vector3(Math.random() * 100 - 50, .2, Math.random() * 100 - 50),
+        new THREE.Vector3(Math.random() * area - (area/2), .2, Math.random() * area - (area/2)),
         Math.random() * (2 * Math.PI),
         undefined,
         sex,
@@ -47,24 +93,22 @@ const generateSphere = (sex, attractiveness, strength, speed, scene) => {
         speed
     )
 
-    console.log("1", ball.pos)
-
     ball.mesh = new THREE.Mesh(new THREE.SphereGeometry(ball.strength / 4 + .2, 8, 8), strengthMaterial)
 
     const attractivenessBall = new THREE.Mesh(new THREE.SphereGeometry(ball.attractiveness / 4 + .2, 8, 8), attractivenessMaterial)
     attractivenessBall.position.set(0, .5, 0);
     ball.mesh.add(attractivenessBall)
-    attractivenessBall.castShadow = true
-    attractivenessBall.receiveShadow = true
+    attractivenessBall.castShadow = false
+    attractivenessBall.receiveShadow = false
 
     const sexGeometry = new THREE.Mesh(ball.sex == "M" ? maleGeometry : femaleGeometry, basicMaterial)
     sexGeometry.position.set(0, 1, 0)
     ball.mesh.add(sexGeometry)
-    sexGeometry.castShadow = true
-    sexGeometry.receiveShadow = true
+    sexGeometry.castShadow = false
+    sexGeometry.receiveShadow = false
 
-    ball.mesh.castShadow = true;
-    ball.mesh.receiveShadow = true;
+    ball.mesh.castShadow = false;
+    ball.mesh.receiveShadow = false;
 
     scene.add(ball.mesh)
 
@@ -154,21 +198,26 @@ const meet = (ball1, ball2, index1, index2, scene, spheres) => {
 }
 
 function moveSpheres(spheres) {
-    // console.log(spheres)
     for (let i = 0; i < spheres.length; i++) {
         const ball = spheres[i];
         const speed = ball.speed / 10 + 0.01;
         ball.pos.x += Math.cos(ball.angle) * speed;
         ball.pos.z += Math.sin(ball.angle) * speed;
 
-        // gestion des bords du plan
-        if (ball.pos.x < -area / 2) ball.pos.x = area / 2;
-        if (ball.pos.x > area / 2) ball.pos.x = -area / 2;
-        if (ball.pos.z < -area / 2) ball.pos.z = area / 2;
-        if (ball.pos.z > area / 2) ball.pos.z = -area / 2;
+        if (ball.pos.distanceTo(new THREE.Vector3(0, .2, 0)) > area) {
+            let angle = Math.atan2(ball.pos.z, ball.pos.x)
+            ball.angle = angle + Math.PI + ((Math.random()-.5)/2)
+        }
 
         // Update the position of the mesh
         ball.mesh.position.copy(ball.pos);
+    }
+}
+
+function drawSpheres() {
+    for (let i = 0; i < spheres.length; i++) {
+        let sphere = spheres[i];
+        sphere.mesh.position.copy(sphere.pos);
     }
 }
 
@@ -182,6 +231,17 @@ function checkCollisions(spheres, scene) {
                 const distance = ball1.pos.distanceTo(ball2.pos);
                 const sumRadii = ball1.mesh.geometry.parameters.radius + ball2.mesh.geometry.parameters.radius;
 
+                ball1.nn.ni[0] = ball1.distance(ball2)
+                ball1.nn.ni[1] = ball1.relativeSpeed(ball2)
+                ball1.nn.ni[2] = ball1.sexualityOf(ball2)
+                // ball1.nn.sumFuncNH()
+                ball1.nn.sumFuncNO()
+
+
+                if (ball1.speed > minSpeed && ball1.speed < maxSpeed) ball1.speed += ball1.nn.no[0]/1000;
+                ball1.angle += ball1.nn.no[1]/500
+
+
                 if (distance < sumRadii) {
                     meet(ball1, ball2, i, j, scene, spheres)
                     return spheres
@@ -194,7 +254,5 @@ function checkCollisions(spheres, scene) {
     }
     return spheres
 }
-
-// ------------------------------------------------------------------------------------------------
 
 export { moveSpheres, checkCollisions, generateSphere }
