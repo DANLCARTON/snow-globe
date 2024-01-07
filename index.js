@@ -6,6 +6,7 @@ import { FirstPersonControls } from 'FirstPersonControls';
 import { conwayStructure } from './conway_structures/index.js'
 import { fancySnowflake } from './fancy_snowflakes/index.js'
 import { lUrban } from "./l-urban/index.js";
+import { voroways } from "./voroways/index.js";
 import { moveSpheres, checkCollisions, generateSphere } from "./living-balls/index.js";
 
 // BASIC SETUP
@@ -20,7 +21,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 // lumières
-scene.add(new THREE.AmbientLight(0xf4e99b, .2))
+scene.add(new THREE.AmbientLight(0xffffff, .2))
 const p1 = new THREE.PointLight(0xffffff, 1000)
 p1.castShadow = false
 p1.position.set(0, 20, 0)
@@ -49,7 +50,7 @@ groundMesh.position.y -= 2.5
 scene.add(groundMesh)
 
 const dome = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
-const domeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, opacity:.5, transparent: true})
+const domeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, opacity:.3, transparent: true})
 const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
@@ -73,17 +74,23 @@ scene.add(domeMesh)
 //     scene.add(snowflake)
 // }
 
-// L-URBAN
-lUrban.scale.x = lUrban.scale.x/2
-lUrban.scale.z = lUrban.scale.z/2
-lUrban.position.y += .1
-scene.add(lUrban)
+// // L-URBAN
+// lUrban.scale.x = lUrban.scale.x/2
+// lUrban.scale.z = lUrban.scale.z/2
+// lUrban.position.y += .1
+// scene.add(lUrban)
+
+// VOROWAYS
+// voroways.scale.x = voroways.scale.x/2
+// voroways.scale.z = voroways.scale.z/2
+voroways.position.y += .1
+scene.add(voroways)
 
 // LIVING BALLS
 var spheres = []
-for (let i = 0; i < 50; i++) {
-    spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
-}
+// for (let i = 0; i < 50; i++) {
+//     spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+// }
 
 
 // ----------------------------------------------------------------
