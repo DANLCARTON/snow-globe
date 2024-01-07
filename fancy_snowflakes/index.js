@@ -77,7 +77,9 @@ if (URL_WIREFRAME) { // choix des paramètres du matériau (wireframes ou pas)
     }
 } else {
     materialProperties = {
-        color: 0xffffff
+        color: 0xffffff,
+        clearcoat: 1.0,
+        emissive: 0x888888
     }
 }
 const material = new THREE.MeshPhongMaterial(materialProperties)

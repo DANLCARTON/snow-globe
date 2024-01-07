@@ -62,17 +62,28 @@ scene.add(domeMesh)
 // conwayStructure2.position.z = -30
 // scene.add(conwayStructure2)
 
-// // FANCY SNOWFLAKES
-// for (let i = 0; i < 200; i++) {
-//     const snowflake = fancySnowflake.clone()
-//     snowflake.position.x += (Math.random() * 100) - 50
-//     snowflake.position.z += (Math.random() * 100) - 50
-//     snowflake.position.y += Math.random() * 60
-//     snowflake.rotation.x += Math.random() * 100
-//     snowflake.rotation.z += Math.random() * 100
-//     snowflake.rotation.y += Math.random() * 100
-//     scene.add(snowflake)
-// }
+// FANCY SNOWFLAKES
+let snowflakes = []
+for (let i = 0; i < 500; i++) { // snowflakes number here
+    const snowflake = fancySnowflake.clone()
+
+    const angle = Math.random()* (2*Math.PI)
+
+    snowflake.position.x += Math.cos(angle)*(Math.random()*26)
+    snowflake.position.z += Math.sin(angle)*(Math.random()*26)
+    snowflake.position.y += Math.random() * Math.sqrt(620 - Math.pow(Math.sqrt(snowflake.position.x*snowflake.position.x + snowflake.position.z*snowflake.position.z), 2));
+
+    snowflake.rotation.x += Math.random() * 100
+    snowflake.rotation.z += Math.random() * 100
+    snowflake.rotation.y += Math.random() * 100
+
+    snowflake.scale.x = .3
+    snowflake.scale.y = .3
+    snowflake.scale.z = .3
+
+    snowflakes.push(snowflake)
+    scene.add(snowflake)
+}
 
 // // L-URBAN
 // lUrban.scale.x = lUrban.scale.x/2
@@ -116,6 +127,20 @@ function animate() {
     moveSpheres(spheres)
     spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
+
+    snowflakes.map(sf => {
+        sf.position.y -= .02
+        sf.rotation.x += Math.random() * .02
+        sf.rotation.z += Math.random() * .02
+        sf.rotation.y += Math.random() * .02
+        if (sf.position.y <= -.2) {
+            const angle = Math.random()* (2*Math.PI)
+            sf.position.x += Math.cos(angle)*(Math.random()*26)
+            sf.position.z += Math.sin(angle)*(Math.random()*26)
+            sf.position.y = Math.sqrt(620 - Math.pow(Math.sqrt(sf.position.x*sf.position.x + sf.position.z*sf.position.z), 2));
+        }
+    })
+
 }
 
 // on applique des règles autant de fois qu'on a défini d'itérations 

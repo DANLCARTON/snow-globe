@@ -2,8 +2,6 @@ URGENT
 - voir la taille des trucs dessus
 
 A FAIRE
-- Routes WFC pour placer les bâtiments
-https://www.boristhebrave.com/2020/02/08/wave-function-collapse-tips-and-tricks/
 - Neuroévolution
 - Textures
 - Chaine de Markov (nuages avec les fractales, pluie petit mesh de merde, neige fractales, éclairs à voir peut-être l-system)
