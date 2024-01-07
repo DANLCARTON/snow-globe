@@ -1,7 +1,7 @@
 import * as THREE from 'three'; // importation de three.js
 import models from "./models.js" // importation des modèles préfaits pour la simulation
 
-const model = "pulsar"
+const model = "snowGlobePulsar"
 let gen = 50
 
 // fonction permettant de supprimer les bords de chaque couche de la simulation parce que ça cause des problèmes. 
@@ -88,7 +88,8 @@ let cubes = []; // tableau qui va représenter la couche initiale, à partir de 
 // if (model === "blincker") cubes = models["blincker"]
 // else if (model === "toad") cubes = models["toad"]
 // else if (model === "beacon") cubes = models["beacon"]
-if (model === "pulsar") cubes = models["pulsar"]
+if (model === "snowGlobePulsar") cubes = models["snowGlobePulsar"]
+    // else if (model === "pulsar") cubes = models["pulsar"]
     // else if (model === "pentadecathlon") cubes = models["pentadecathlon"]
     // else if (model === "4blinckers") cubes = models["4blinckers"]
     // else if (model === "oscillators") cubes = models["oscillators"]

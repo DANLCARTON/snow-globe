@@ -6,7 +6,7 @@ import { FirstPersonControls } from 'FirstPersonControls';
 import { conwayStructure } from './conway_structures/index.js'
 import { fancySnowflake } from './fancy_snowflakes/index.js'
 import { lUrban } from "./l-urban/index.js";
-import { voroways } from "./voroways/index.js";
+import { voroways, selectedPositions } from "./voroways/index.js";
 import { moveSpheres, checkCollisions, generateSphere } from "./living-balls/index.js";
 
 // BASIC SETUP
@@ -54,17 +54,32 @@ const domeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, opacity:.3, t
 const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
-// // CONWAY STRUCTURES
-// conwayStructure.position.y += 50
-// scene.add(conwayStructure)
-// const conwayStructure2 = conwayStructure.clone()
-// conwayStructure2.position.x = -50
-// conwayStructure2.position.z = -30
-// scene.add(conwayStructure2)
+// CONWAY STRUCTURE - AUTOMATE CELLULAIRE
+for (let i = 0; i < 3; i++) {
+    const structure = conwayStructure.clone();
+    structure.position.x = selectedPositions[i+20][0]-9;
+    structure.position.z = selectedPositions[i+20][1]-9;
+    structure.position.y += 50
 
-// FANCY SNOWFLAKES
+    const distanceToCenter = Math.sqrt(structure.position.x*structure.position.x + structure.position.z*structure.position.z)
+
+    structure.scale.x *= .02
+    structure.scale.y *= .02
+    structure.scale.z *= .02
+    structure.position.y -= 49
+
+    structure.scale.x *= 25 * (1-(distanceToCenter/26))
+    structure.scale.y *= 25 * (1-(distanceToCenter/26))
+    structure.scale.z *= 25 * (1-(distanceToCenter/26))
+    
+    structure.position.y += 22 * (1-(distanceToCenter/26))
+    
+    scene.add(structure)
+}
+
+// FANCY SNOWFLAKES - FRACTALES
 let snowflakes = []
-for (let i = 0; i < 500; i++) { // snowflakes number here
+for (let i = 0; i < 1; i++) { // snowflakes number here
     const snowflake = fancySnowflake.clone()
 
     const angle = Math.random()* (2*Math.PI)
@@ -85,19 +100,17 @@ for (let i = 0; i < 500; i++) { // snowflakes number here
     scene.add(snowflake)
 }
 
-// // L-URBAN
+// // L-URBAN - ALGORITHME EN TORTUE
 // lUrban.scale.x = lUrban.scale.x/2
 // lUrban.scale.z = lUrban.scale.z/2
 // lUrban.position.y += .1
 // scene.add(lUrban)
 
-// VOROWAYS
-// voroways.scale.x = voroways.scale.x/2
-// voroways.scale.z = voroways.scale.z/2
+// VOROWAYS - DIAGRAMME DE VORONOI
 voroways.position.y += .1
 scene.add(voroways)
 
-// LIVING BALLS
+// LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES
 var spheres = []
 // for (let i = 0; i < 50; i++) {
 //     spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))

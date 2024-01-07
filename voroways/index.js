@@ -7,7 +7,7 @@ const width = 100
 const height = 100
 const nbVertices = 10
 const maxSize = 25
-const zones = 50
+const cells = 50
 
 // textures
 const texture = new THREE.TextureLoader().load("./voroways/road.png")
@@ -62,9 +62,15 @@ const drawAllPlanes = (points) => {
 }
 
 const gaussianRandom = () => {
-    let u = Math.random();
-    let v = Math.random();
-    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
+    let u, v, s;
+    do {
+        u = Math.random() * 2 - 1; // Étend la plage à [-1, 1] pour la moyenne de 0.5
+        v = Math.random() * 2 - 1;
+        s = u * u + v * v;
+    } while (s >= 1 || s === 0);
+
+    const multiplier = Math.sqrt(-2 * Math.log(s) / s);
+    return 0.5 + 0.5 * u * multiplier; // Ajuste la moyenne à 0.5 et l'étend à [0, 1]
 }
 
 const logNormalRandom = () => {
@@ -73,16 +79,22 @@ const logNormalRandom = () => {
     return Math.exp(mean + sigma * gaussianRandom())
 }
 
-var vertices = d3.range(zones).map(function(d) {
+const selectedPositions = []
+var vertices = d3.range(cells).map(function(d) {
     const angle = Math.random() * Math.PI * 2;
-    const radius = logNormalRandom() * 26;
+    const radius = Math.random() * 26;
+    // console.log(gaussianRandom())
     const x = radius * Math.cos(angle)
     const y = radius * Math.sin(angle)
     // console.log(x, y)
+    if (x < 20 && y < 20 && x > -20 && y > -20) selectedPositions.push([x, y])
     return [x, y];
 });
 
+console.log(selectedPositions)
+
 var delaunay = d3.Delaunay.from(vertices);
+// console.log(delaunay)
 const voronoi = delaunay.voronoi([-maxSize, -maxSize, maxSize, maxSize]);
 const polygons = Array.from(voronoi.cellPolygons());
 
@@ -110,7 +122,7 @@ polygons.map(poly => {
     poly.map(ver => {
         // console.log(ver[0], ver[1])
         const distanceFromCenter = Math.sqrt((ver[0]-0)*(ver[0]-0) + (ver[1]-0)*(ver[1]-0))
-        console.log(distanceFromCenter)
+        // console.log(distanceFromCenter)
         if (distanceFromCenter < maxSize) points.push(new THREE.Vector3(ver[0], 0, ver[1]))
         // if ((ver[0] < maxSize && ver[0] > -maxSize) && (ver[1] < maxSize && ver[1] > -maxSize)) points.push(new THREE.Vector3(ver[0], 0, ver[1]))
 
@@ -148,4 +160,4 @@ polygons.map(poly => {
 // on applique des règles autant de fois qu'on a défini d'itérations 
 // animate();
 
-export {voroways}
+export {voroways, selectedPositions}
