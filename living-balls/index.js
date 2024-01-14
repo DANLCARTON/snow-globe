@@ -24,21 +24,12 @@ const femaleGeometry = new THREE.SphereGeometry(.2, 8, 8)
 
 class NN {
     // constructor(ni, w, no, nh, nhw) {
-    constructor(ni, w, no) {
+    constructor(ni, w, nh, wh, no) {
         this.ni = ni // neurones entrée
-        this.w = w // poids neurones || a faire : des poids différents pour no0 et no1
+        this.w = w // poids neurones 
         this.no = no // neurones sortie
-    }
-    sumFuncNO = () => {
-        for (let i = 0; i < this.no.length; i++) {
-            this.no[i] = 0;
-            for (let j = 0; j < this.ni.length; j++) {
-                for (let k = 0; k < this.w[j].length ; k++) {
-                    this.no[j] += this.ni[j]*this.w[j][k]
-                }
-                
-            }
-        }
+        this.nh = nh // neurones cachés
+        this.wh = wh // poids des neurones cachés
     }
 }
 
@@ -56,12 +47,20 @@ class Ball {
         this.speed = speed
         this.nn = new NN(
             [0, 0, 0], // neurones d'entrée
-            [[(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], 
-            [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], 
-            [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1]], // poids des neurones d'entrée
+            [
+                [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
+                [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
+                [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
+            ], // poids des neurones d'entrée
+            [0, 0, 0, 0, 0], // neurones cachés
+            [
+                [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_0_0, N_NH_0_1
+                [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_1_0, N_NH_1_1
+                [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_2_0, N_NH_2_1
+                [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_3_0, N_NH_3_1
+                [(Math.random()*2)-1, (Math.random()*2)-1] // W_NH_4_0, N_NH_4_1
+            ], // poids des neurones cachés
             [0, 0] // neurones de sortie
-            // 5, // nombre de neurones cachés
-            // [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1] // poids des neurones cachés
         )
     }
     distance = (oBall) => {
@@ -79,12 +78,37 @@ class Ball {
         if (oBall.sex == "F") return 1
         else if (oBall.sex == "M") return -1
     } 
+    
+    // NNForward = (oBall) => {
+
+    //     let simulatedNI = [this.distance(oBall), this.relativeSpeed(oBall), this.sexualityOf(oBall)]
+    //     console.log(simulatedNI[3]*this.nn.w[0][3] , simulatedNI[1]*this.nn.w[1][3] , simulatedNI[2]*this.nn.w[2][3],)
+    //     let simulatedNH = [
+    //         simulatedNI[0]*this.nn.w[0][0] + simulatedNI[1]*this.nn.w[1][0] + simulatedNI[2]*this.nn.w[2][0],
+    //         simulatedNI[0]*this.nn.w[0][1] + simulatedNI[1]*this.nn.w[1][1] + simulatedNI[2]*this.nn.w[2][1],
+    //         simulatedNI[0]*this.nn.w[0][2] + simulatedNI[1]*this.nn.w[1][2] + simulatedNI[2]*this.nn.w[2][2],
+    //         simulatedNI[0]*this.nn.w[0][3] + simulatedNI[1]*this.nn.w[1][3] + simulatedNI[2]*this.nn.w[2][3],
+    //         simulatedNI[0]*this.nn.w[0][4] + simulatedNI[1]*this.nn.w[1][4] + simulatedNI[2]*this.nn.w[2][4]
+    //     ]
+    //     let simulatedNO = [
+    //         simulatedNH[0]*this.nn.wh[0][0] + simulatedNH[1]*this.nn.wh[1][0] + simulatedNH[2]*this.nn.wh[2][0] + simulatedNH[3]*this.nn.wh[3][0] + simulatedNH[4]*this.nn.wh[4][0],
+    //         simulatedNH[1]*this.nn.wh[0][1] + simulatedNH[1]*this.nn.wh[1][1] + simulatedNH[2]*this.nn.wh[2][1] + simulatedNH[3]*this.nn.wh[3][1] + simulatedNH[4]*this.nn.wh[4][1]
+    //     ]
+    //     console.log("simulatedNI : " +simulatedNI)
+    //     console.log("simulatedNH : " +simulatedNH)
+    //     console.log("simulatedNO : " +simulatedNO)
+    //     return simulatedNO
+    // }
+
+    // NNBackward = (cost) => {
+    //     let outputError = this.NNForward.map((o, i) => o)
+    // }
 }
 
 // FUNCTION DEF
 const generateSphere = (sex, attractiveness, strength, speed, scene) => {
     const ball = new Ball(
-        new THREE.Vector3(Math.random() * area - (area/2), .2, Math.random() * area - (area/2)),
+        new THREE.Vector3(Math.random()*area-(area/2), .2, Math.random()*area-(area/2)),
         Math.random() * (2 * Math.PI),
         undefined,
         sex,
@@ -221,6 +245,22 @@ function drawSpheres() {
     }
 }
 
+function NNchange(ball1, ball2) {
+    ball1.nn.ni[0] = ball1.distance(ball2)
+    ball1.nn.ni[1] = ball1.relativeSpeed(ball2)
+    ball1.nn.ni[2] = ball1.sexualityOf(ball2)
+
+    ball1.nn.nh[0] = ball1.nn.ni[0]*ball1.nn.w[0][0] + ball1.nn.ni[1]*ball1.nn.w[1][0] + ball1.nn.ni[2]*ball1.nn.w[2][0]
+    ball1.nn.nh[1] = ball1.nn.ni[0]*ball1.nn.w[0][1] + ball1.nn.ni[1]*ball1.nn.w[1][1] + ball1.nn.ni[2]*ball1.nn.w[2][1]
+    ball1.nn.nh[2] = ball1.nn.ni[0]*ball1.nn.w[0][2] + ball1.nn.ni[1]*ball1.nn.w[1][2] + ball1.nn.ni[2]*ball1.nn.w[2][2]
+    ball1.nn.nh[3] = ball1.nn.ni[0]*ball1.nn.w[0][3] + ball1.nn.ni[1]*ball1.nn.w[1][3] + ball1.nn.ni[2]*ball1.nn.w[2][3]
+    ball1.nn.nh[4] = ball1.nn.ni[0]*ball1.nn.w[0][4] + ball1.nn.ni[1]*ball1.nn.w[1][4] + ball1.nn.ni[2]*ball1.nn.w[2][4]
+
+    ball1.nn.no[0] = ball1.nn.nh[0]*ball1.nn.wh[0][0] + ball1.nn.nh[1]*ball1.nn.wh[1][0] * ball1.nn.nh[2]*ball1.nn.wh[2][0] + ball1.nn.nh[3]*ball1.nn.wh[3][0] + ball1.nn.nh[4]*ball1.nn.wh[4][0]
+    ball1.nn.no[1] = ball1.nn.nh[0]*ball1.nn.wh[0][1] + ball1.nn.nh[1]*ball1.nn.wh[1][1] * ball1.nn.nh[2]*ball1.nn.wh[2][1] + ball1.nn.nh[3]*ball1.nn.wh[3][1] + ball1.nn.nh[4]*ball1.nn.wh[4][1]
+}
+
+
 function checkCollisions(spheres, scene) {
     for (let i = 0; i < spheres.length; i++) {
         for (let j = 0; j < spheres.length; j++) {
@@ -230,13 +270,9 @@ function checkCollisions(spheres, scene) {
 
                 const distance = ball1.pos.distanceTo(ball2.pos);
                 const sumRadii = ball1.mesh.geometry.parameters.radius + ball2.mesh.geometry.parameters.radius;
-
-                ball1.nn.ni[0] = ball1.distance(ball2)
-                ball1.nn.ni[1] = ball1.relativeSpeed(ball2)
-                ball1.nn.ni[2] = ball1.sexualityOf(ball2)
-                // ball1.nn.sumFuncNH()
-                ball1.nn.sumFuncNO()
-
+                
+                NNchange(ball1, ball2)
+                // console.log(ball1.nn.no)
 
                 if (ball1.speed > minSpeed && ball1.speed < maxSpeed) ball1.speed += ball1.nn.no[0]/1000;
                 ball1.angle += ball1.nn.no[1]/500
@@ -255,4 +291,4 @@ function checkCollisions(spheres, scene) {
     return spheres
 }
 
-export { moveSpheres, checkCollisions, generateSphere }
+export { moveSpheres, checkCollisions, generateSphere, costFunction }

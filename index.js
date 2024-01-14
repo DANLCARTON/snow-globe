@@ -7,7 +7,7 @@ import { conwayStructure } from './conway_structures/index.js'
 import { fancySnowflake } from './fancy_snowflakes/index.js'
 import { lUrban } from "./l-urban/index.js";
 import { voroways, selectedPositions } from "./voroways/index.js";
-import { moveSpheres, checkCollisions, generateSphere } from "./living-balls/index.js";
+import { moveSpheres, checkCollisions, generateSphere, costFunction } from "./living-balls/index.js";
 
 // BASIC SETUP
 
@@ -55,50 +55,50 @@ const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
 // CONWAY STRUCTURE - AUTOMATE CELLULAIRE
-for (let i = 0; i < 3; i++) {
-    const structure = conwayStructure.clone();
-    structure.position.x = selectedPositions[i+20][0]-9;
-    structure.position.z = selectedPositions[i+20][1]-9;
-    structure.position.y += 50
+// for (let i = 0; i < 3; i++) {
+//     const structure = conwayStructure.clone();
+//     structure.position.x = selectedPositions[i+20][0]-9;
+//     structure.position.z = selectedPositions[i+20][1]-9;
+//     structure.position.y += 50
 
-    const distanceToCenter = Math.sqrt(structure.position.x*structure.position.x + structure.position.z*structure.position.z)
+//     const distanceToCenter = Math.sqrt(structure.position.x*structure.position.x + structure.position.z*structure.position.z)
 
-    structure.scale.x *= .02
-    structure.scale.y *= .02
-    structure.scale.z *= .02
-    structure.position.y -= 49
+//     structure.scale.x *= .02
+//     structure.scale.y *= .02
+//     structure.scale.z *= .02
+//     structure.position.y -= 49
 
-    structure.scale.x *= 25 * (1-(distanceToCenter/26))
-    structure.scale.y *= 25 * (1-(distanceToCenter/26))
-    structure.scale.z *= 25 * (1-(distanceToCenter/26))
+//     structure.scale.x *= 25 * (1-(distanceToCenter/26))
+//     structure.scale.y *= 25 * (1-(distanceToCenter/26))
+//     structure.scale.z *= 25 * (1-(distanceToCenter/26))
     
-    structure.position.y += 22 * (1-(distanceToCenter/26))
+//     structure.position.y += 22 * (1-(distanceToCenter/26))
     
-    scene.add(structure)
-}
+//     scene.add(structure)
+// }
 
 // FANCY SNOWFLAKES - FRACTALES
-let snowflakes = []
-for (let i = 0; i < 1; i++) { // snowflakes number here
-    const snowflake = fancySnowflake.clone()
+// let snowflakes = []
+// for (let i = 0; i < 1; i++) { // snowflakes number here
+//     const snowflake = fancySnowflake.clone()
 
-    const angle = Math.random()* (2*Math.PI)
+//     const angle = Math.random()* (2*Math.PI)
 
-    snowflake.position.x += Math.cos(angle)*(Math.random()*26)
-    snowflake.position.z += Math.sin(angle)*(Math.random()*26)
-    snowflake.position.y += Math.random() * Math.sqrt(620 - Math.pow(Math.sqrt(snowflake.position.x*snowflake.position.x + snowflake.position.z*snowflake.position.z), 2));
+//     snowflake.position.x += Math.cos(angle)*(Math.random()*26)
+//     snowflake.position.z += Math.sin(angle)*(Math.random()*26)
+//     snowflake.position.y += Math.random() * Math.sqrt(620 - Math.pow(Math.sqrt(snowflake.position.x*snowflake.position.x + snowflake.position.z*snowflake.position.z), 2));
 
-    snowflake.rotation.x += Math.random() * 100
-    snowflake.rotation.z += Math.random() * 100
-    snowflake.rotation.y += Math.random() * 100
+//     snowflake.rotation.x += Math.random() * 100
+//     snowflake.rotation.z += Math.random() * 100
+//     snowflake.rotation.y += Math.random() * 100
 
-    snowflake.scale.x = .3
-    snowflake.scale.y = .3
-    snowflake.scale.z = .3
+//     snowflake.scale.x = .3
+//     snowflake.scale.y = .3
+//     snowflake.scale.z = .3
 
-    snowflakes.push(snowflake)
-    scene.add(snowflake)
-}
+//     snowflakes.push(snowflake)
+//     scene.add(snowflake)
+// }
 
 // // L-URBAN - ALGORITHME EN TORTUE
 // lUrban.scale.x = lUrban.scale.x/2
@@ -106,16 +106,16 @@ for (let i = 0; i < 1; i++) { // snowflakes number here
 // lUrban.position.y += .1
 // scene.add(lUrban)
 
-// VOROWAYS - DIAGRAMME DE VORONOI
-voroways.position.y += .1
-scene.add(voroways)
+// // VOROWAYS - DIAGRAMME DE VORONOI
+// voroways.position.y += .1
+// scene.add(voroways)
 
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES
 var spheres = []
-// for (let i = 0; i < 50; i++) {
-//     spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
-// }
-
+for (let i = 0; i < 10; i++) {
+    spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+}
+costFunction(spheres)
 
 // ----------------------------------------------------------------
 
@@ -137,22 +137,22 @@ function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
     controls.update();
-    moveSpheres(spheres)
+    // moveSpheres(spheres)
     spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
 
-    snowflakes.map(sf => {
-        sf.position.y -= .02
-        sf.rotation.x += Math.random() * .02
-        sf.rotation.z += Math.random() * .02
-        sf.rotation.y += Math.random() * .02
-        if (sf.position.y <= -.2) {
-            const angle = Math.random()* (2*Math.PI)
-            sf.position.x += Math.cos(angle)*(Math.random()*26)
-            sf.position.z += Math.sin(angle)*(Math.random()*26)
-            sf.position.y = Math.sqrt(620 - Math.pow(Math.sqrt(sf.position.x*sf.position.x + sf.position.z*sf.position.z), 2));
-        }
-    })
+    // snowflakes.map(sf => {
+    //     sf.position.y -= .02
+    //     sf.rotation.x += Math.random() * .02
+    //     sf.rotation.z += Math.random() * .02
+    //     sf.rotation.y += Math.random() * .02
+    //     if (sf.position.y <= -.2) {
+    //         const angle = Math.random()* (2*Math.PI)
+    //         sf.position.x += Math.cos(angle)*(Math.random()*26)
+    //         sf.position.z += Math.sin(angle)*(Math.random()*26)
+    //         sf.position.y = Math.sqrt(620 - Math.pow(Math.sqrt(sf.position.x*sf.position.x + sf.position.z*sf.position.z), 2));
+    //     }
+    // })
 
 }
 
