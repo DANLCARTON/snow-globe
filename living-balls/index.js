@@ -45,20 +45,37 @@ class Ball {
         this.attractiveness = attractiveness
         this.strength = strength
         this.speed = speed
+        // this.nn = new NN(
+        //     [0, 0, 0], // neurones d'entrée
+        //     [
+        //         [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
+        //         [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
+        //         [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
+        //     ], // poids des neurones d'entrée
+        //     [0, 0, 0, 0, 0], // neurones cachés
+        //     [
+        //         [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_0_0, N_NH_0_1
+        //         [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_1_0, N_NH_1_1
+        //         [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_2_0, N_NH_2_1
+        //         [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_3_0, N_NH_3_1
+        //         [(Math.random()*2)-1, (Math.random()*2)-1] // W_NH_4_0, N_NH_4_1
+        //     ], // poids des neurones cachés
+        //     [0, 0] // neurones de sortie
+        // )
         this.nn = new NN(
             [0, 0, 0], // neurones d'entrée
             [
-                [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
-                [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
-                [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
+                [0.5020197, 0.5020197, 0.5020197, 0.5020197, 0.5020197], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
+                [0.1003678, 0.1003678, 0.1003678, 0.1003678, 0.1003678], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
+                [-0.16376845, -0.16376845, -0.16376845, -0.16376845, -0.16376845] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
             ], // poids des neurones d'entrée
             [0, 0, 0, 0, 0], // neurones cachés
             [
-                [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_0_0, N_NH_0_1
-                [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_1_0, N_NH_1_1
-                [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_2_0, N_NH_2_1
-                [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_3_0, N_NH_3_1
-                [(Math.random()*2)-1, (Math.random()*2)-1] // W_NH_4_0, N_NH_4_1
+                [-0.90328451, -0.90328451], // W_NH_0_0, N_NH_0_1
+                [-0.90328451, -0.90328451], // W_NH_1_0, N_NH_1_1
+                [-0.90328451, -0.90328451], // W_NH_2_0, N_NH_2_1
+                [-0.90328451, -0.90328451], // W_NH_3_0, N_NH_3_1
+                [-0.90328451, -0.90328451] // W_NH_4_0, N_NH_4_1
             ], // poids des neurones cachés
             [0, 0] // neurones de sortie
         )
@@ -80,7 +97,6 @@ class Ball {
     } 
     
     // NNForward = (oBall) => {
-
     //     let simulatedNI = [this.distance(oBall), this.relativeSpeed(oBall), this.sexualityOf(oBall)]
     //     console.log(simulatedNI[3]*this.nn.w[0][3] , simulatedNI[1]*this.nn.w[1][3] , simulatedNI[2]*this.nn.w[2][3],)
     //     let simulatedNH = [
@@ -98,10 +114,6 @@ class Ball {
     //     console.log("simulatedNH : " +simulatedNH)
     //     console.log("simulatedNO : " +simulatedNO)
     //     return simulatedNO
-    // }
-
-    // NNBackward = (cost) => {
-    //     let outputError = this.NNForward.map((o, i) => o)
     // }
 }
 
@@ -291,4 +303,111 @@ function checkCollisions(spheres, scene) {
     return spheres
 }
 
-export { moveSpheres, checkCollisions, generateSphere, costFunction }
+
+
+
+
+
+
+
+
+
+// ENTRAINEMENT DU NN
+
+function NNForward(ball, inputs) {
+    ball.nn.ni[0] = inputs[0]
+    ball.nn.ni[1] = inputs[1]
+    ball.nn.ni[2] = inputs[2]
+
+    for (let i = 0; i < ball.nn.nh.length; i++) {
+        ball.nn.nh[i] = 0;
+        for (let j = 0; j < ball.nn.ni.length; j++) {
+            ball.nn.nh[i] += ball.nn.ni[j] * ball.nn.w[j][i];
+        }
+        ball.nn.nh[i] = sigmoid(ball.nn.nh[i]);  // Applique une fonction d'activation, par exemple sigmoid
+    }
+
+    for (let i = 0; i < ball.nn.no.length; i++) {
+        ball.nn.no[i] = 0;
+        for (let j = 0; j < ball.nn.nh.length; j++) {
+            ball.nn.no[i] += ball.nn.nh[j] * ball.nn.wh[j][i];
+        }
+        ball.nn.no[i] = sigmoid(ball.nn.no[i]);  // Applique une fonction d'activation, par exemple sigmoid
+    }
+
+    return ball.nn.no
+}
+
+function sigmoid(x) {
+    return 1 / (1 + Math.exp(-x));
+}
+
+
+function NNBackward(ball, loss) {
+    // Rétropropagation du gradient pour ajuster les poids du réseau
+
+    // Calcul des gradients pour les poids entre les neurones de sortie et les neurones cachés
+    for (let i = 0; i < ball.nn.wh.length; i++) {
+        for (let j = 0; j < ball.nn.wh[i].length; j++) {
+            let delta = ball.nn.no[j] * (1 - ball.nn.no[j]) * loss;  // Dérivée de la fonction d'activation
+            ball.nn.wh[i][j] -= ball.nn.nh[i] * delta;
+        }
+    }
+
+    // Calcul des gradients pour les poids entre les neurones d'entrée et les neurones caché
+    for (let i = 0; i < ball.nn.w.length; i++) {
+        for (let j = 0; j < ball.nn.w[i].length; j++) {
+            let sum = 0;
+            for (let k = 0; k < ball.nn.no.length; k++) {
+                sum += ball.nn.wh[j][k] * (ball.nn.no[k] * (1 - ball.nn.no[k]) * loss);
+            }
+            let delta = ball.nn.nh[j] * (1 - ball.nn.nh[j]) * sum;  // Dérivée de la fonction d'activation
+            ball.nn.w[i][j] -= ball.nn.ni[i] * delta;
+        }
+    }
+}
+
+function trainNetwork(ball, inputs, expectedOutputs, learningRate) {
+    // Forward pass
+    let output = NNForward(ball, inputs);
+
+    // Calculate loss
+    let loss = calculateLoss(output, expectedOutputs);
+
+    // Backward pass
+    NNBackward(ball, loss);
+
+    // Update weights using gradient descent
+    updateWeights(ball, learningRate);
+}
+
+function calculateLoss(output, expected) {
+    // Calcul de la perte (loss), par exemple, erreur quadratique moyenne
+    let sum = 0;
+    for (let i = 0; i < output.length; i++) {
+        sum += Math.pow(output[i] - expected[i], 2);
+    }
+    return sum / output.length;
+}
+
+function updateWeights(ball, learningRate) {
+    // Mise à jour des poids du réseau en utilisant le gradient descent
+
+    // Mise à jour des poids entre les neurones d'entrée et les neurones cachés
+    for (let i = 0; i < ball.nn.w.length; i++) {
+        for (let j = 0; j < ball.nn.w[i].length; j++) {
+            ball.nn.w[i][j] -= learningRate * ball.nn.w[i][j];
+        }
+    }
+
+    // Mise à jour des poids entre les neurones de sortie et les neurones cachés
+    for (let i = 0; i < ball.nn.wh.length; i++) {
+        for (let j = 0; j < ball.nn.wh[i].length; j++) {
+            ball.nn.wh[i][j] -= learningRate * ball.nn.wh[i][j];
+        }
+    }
+}
+
+
+
+export { moveSpheres, checkCollisions, generateSphere, trainNetwork }

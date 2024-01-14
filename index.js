@@ -7,7 +7,7 @@ import { conwayStructure } from './conway_structures/index.js'
 import { fancySnowflake } from './fancy_snowflakes/index.js'
 import { lUrban } from "./l-urban/index.js";
 import { voroways, selectedPositions } from "./voroways/index.js";
-import { moveSpheres, checkCollisions, generateSphere, costFunction } from "./living-balls/index.js";
+import { moveSpheres, checkCollisions, generateSphere, trainNetwork } from "./living-balls/index.js";
 
 // BASIC SETUP
 
@@ -112,10 +112,45 @@ scene.add(domeMesh)
 
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES
 var spheres = []
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 50; i++) {
     spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 }
-costFunction(spheres)
+
+// Utilisation de la fonction d'entraînement
+// const trainingData = [
+//     {
+//         inputs: [1.0, 0.5, 1.0],  // Exemple de deux femelles se rapprochant
+//         expectedOutputs: [0.8, 0.2],  // Les sorties attendues selon ton objectif
+//     },
+//     {
+//         inputs: [0.5, -0.2, -1.0],  // Exemple d'un mâle et une femelle se rapprochant
+//         expectedOutputs: [0.7, 0.3],  // Les sorties attendues selon ton objectif
+//     },
+//     {
+//         inputs: [0.8, 0.1, -1.0],  // Exemple de deux mâles s'évitant
+//         expectedOutputs: [0.2, 0.8],  // Les sorties attendues selon ton objectif
+//     },
+// ];
+
+// // Taux d'apprentissage
+// const learningRate = 0.01;
+
+// // Entraînement du réseau avec les scénarios définis
+
+// spheres.map(s => {
+//     console.log("Avant entraînement : ", s.nn);
+    
+//     for (let epoch = 0; epoch < 1000; epoch++) {
+//         for (let i = 0; i < trainingData.length; i++) {
+//             const example = trainingData[i];
+            
+//             // Exécute la fonction d'entraînement avec l'exemple actuel
+//             trainNetwork(s, example.inputs, example.expectedOutputs, learningRate);
+//         }
+//     }
+
+//     console.log("Après entraînement : ", s.nn);
+// });
 
 // ----------------------------------------------------------------
 
@@ -137,7 +172,7 @@ function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
     controls.update();
-    // moveSpheres(spheres)
+    moveSpheres(spheres)
     spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
 
