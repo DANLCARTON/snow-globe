@@ -5,7 +5,14 @@ import { FlyControls } from 'FlyControls';
 import { FirstPersonControls } from 'FirstPersonControls';
 import { random3 } from "./max.js"
 
-// VARIABLES
+// PARAMETRES URL
+const urlParams = new URLSearchParams(window.location.search)
+const NN_WEIGHT_METHOD = urlParams.get("NNWeightMethod");
+console.log(NN_WEIGHT_METHOD);
+// la valeur "trained" va donner au créatures un réseau de neurones déjà entrainé
+// n'importe quelle autre valeur va leur donner des valeurs aléatoires et débloquer la fonction de neuroévolution
+
+// PARAMETRES VARIABLES
 let globalBallId = 0;
 
 const area = 25
@@ -35,7 +42,7 @@ class NN {
 
 // CLASS DEF
 class Ball {
-    constructor(pos, angle, mesh, sex, attractiveness, strength, speed) {
+    constructor(pos, angle, mesh, sex, attractiveness, strength, speed, inheritedNNWeights) {
         this.id = globalBallId
         globalBallId++
         this.pos = pos;
@@ -45,44 +52,57 @@ class Ball {
         this.attractiveness = attractiveness
         this.strength = strength
         this.speed = speed
-        // this.nn = new NN(
-        //     [0, 0, 0], // neurones d'entrée
-        //     [
-        //         [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
-        //         [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
-        //         [(Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1, (Math.random()*2)-1] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
-        //     ], // poids des neurones d'entrée
-        //     [0, 0, 0, 0, 0], // neurones cachés
-        //     [
-        //         [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_0_0, N_NH_0_1
-        //         [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_1_0, N_NH_1_1
-        //         [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_2_0, N_NH_2_1
-        //         [(Math.random()*2)-1, (Math.random()*2)-1], // W_NH_3_0, N_NH_3_1
-        //         [(Math.random()*2)-1, (Math.random()*2)-1] // W_NH_4_0, N_NH_4_1
-        //     ], // poids des neurones cachés
-        //     [0, 0] // neurones de sortie
-        // )
-        this.nn = new NN(
-            [0, 0, 0], // neurones d'entrée
-            [
-                [0.5020197, 0.5020197, 0.5020197, 0.5020197, 0.5020197], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
-                [0.1003678, 0.1003678, 0.1003678, 0.1003678, 0.1003678], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
-                [-0.16376845, -0.16376845, -0.16376845, -0.16376845, -0.16376845] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
-            ], // poids des neurones d'entrée
-            [0, 0, 0, 0, 0], // neurones cachés
-            [
-                [-0.90328451, -0.90328451], // W_NH_0_0, N_NH_0_1
-                [-0.90328451, -0.90328451], // W_NH_1_0, N_NH_1_1
-                [-0.90328451, -0.90328451], // W_NH_2_0, N_NH_2_1
-                [-0.90328451, -0.90328451], // W_NH_3_0, N_NH_3_1
-                [-0.90328451, -0.90328451] // W_NH_4_0, N_NH_4_1
-            ], // poids des neurones cachés
-            [0, 0] // neurones de sortie
-        )
+        if (inheritedNNWeights !== undefined) {
+            this.nn = new NN(
+                [0, 0, 0],
+                inheritedNNWeights.w, [0, 0, 0, 0, 0],
+                inheritedNNWeights.wh, [0, 0]
+            )
+        } else {
+            if (NN_WEIGHT_METHOD == "trained") {
+                this.nn = new NN(
+                    [0, 0, 0], // neurones d'entrée
+                    [
+                        [0.6076265902187002, 0.6076265902187002, 0.6076265902187002, 0.6076265902187002, 0.6076265902187002], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
+                        [0.11063947182581162, 0.11063947182581162, 0.11063947182581162, 0.11063947182581162, 0.11063947182581162], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
+                        [-0.20856988200792137, -0.20856988200792137, -0.20856988200792137, -0.20856988200792137, -0.20856988200792137] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
+                    ], // poids des neurones d'entrée
+                    [0, 0, 0, 0, 0], // neurones cachés
+                    [
+                        [-1.031484159491216, -1.031484159491216], // W_NH_0_0, N_NH_0_1
+                        [-1.031484159491216, -1.031484159491216], // W_NH_1_0, N_NH_1_1
+                        [-1.031484159491216, -1.031484159491216], // W_NH_2_0, N_NH_2_1
+                        [-1.031484159491216, -1.031484159491216], // W_NH_3_0, N_NH_3_1
+                        [-1.031484159491216, -1.031484159491216] // W_NH_4_0, N_NH_4_1
+                    ], // poids des neurones cachés
+                    [0, 0] // neurones de sortie
+                )
+            } else {
+                this.nn = new NN(
+                    [0, 0, 0], // neurones d'entrée
+                    [
+                        [(Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
+                        [(Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
+                        [(Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
+                    ], // poids des neurones d'entrée
+                    [0, 0, 0, 0, 0], // neurones cachés
+                    [
+                        [(Math.random() * 2) - 1, (Math.random() * 2) - 1], // W_NH_0_0, N_NH_0_1
+                        [(Math.random() * 2) - 1, (Math.random() * 2) - 1], // W_NH_1_0, N_NH_1_1
+                        [(Math.random() * 2) - 1, (Math.random() * 2) - 1], // W_NH_2_0, N_NH_2_1
+                        [(Math.random() * 2) - 1, (Math.random() * 2) - 1], // W_NH_3_0, N_NH_3_1
+                        [(Math.random() * 2) - 1, (Math.random() * 2) - 1] // W_NH_4_0, N_NH_4_1
+                    ], // poids des neurones cachés
+                    [0, 0] // neurones de sortie
+                )
+            }
+        }
     }
+
     distance = (oBall) => {
         return this.pos.distanceTo(oBall.pos)
     }
+
     relativeSpeed = (oBall) => {
         let thisVelocity = new THREE.Vector2(Math.cos(this.angle), Math.sin(this.angle)).multiplyScalar(this.speed)
         let oBallVelocity = new THREE.Vector2(Math.cos(oBall.angle), Math.sin(oBall.angle)).multiplyScalar(oBall.speed)
@@ -91,42 +111,24 @@ class Ball {
         if (dotProduct < 0) return -relativeVelocity.length()
         else return relativeVelocity.length()
     }
+
     sexualityOf = (oBall) => {
         if (oBall.sex == "F") return 1
         else if (oBall.sex == "M") return -1
-    } 
-    
-    // NNForward = (oBall) => {
-    //     let simulatedNI = [this.distance(oBall), this.relativeSpeed(oBall), this.sexualityOf(oBall)]
-    //     console.log(simulatedNI[3]*this.nn.w[0][3] , simulatedNI[1]*this.nn.w[1][3] , simulatedNI[2]*this.nn.w[2][3],)
-    //     let simulatedNH = [
-    //         simulatedNI[0]*this.nn.w[0][0] + simulatedNI[1]*this.nn.w[1][0] + simulatedNI[2]*this.nn.w[2][0],
-    //         simulatedNI[0]*this.nn.w[0][1] + simulatedNI[1]*this.nn.w[1][1] + simulatedNI[2]*this.nn.w[2][1],
-    //         simulatedNI[0]*this.nn.w[0][2] + simulatedNI[1]*this.nn.w[1][2] + simulatedNI[2]*this.nn.w[2][2],
-    //         simulatedNI[0]*this.nn.w[0][3] + simulatedNI[1]*this.nn.w[1][3] + simulatedNI[2]*this.nn.w[2][3],
-    //         simulatedNI[0]*this.nn.w[0][4] + simulatedNI[1]*this.nn.w[1][4] + simulatedNI[2]*this.nn.w[2][4]
-    //     ]
-    //     let simulatedNO = [
-    //         simulatedNH[0]*this.nn.wh[0][0] + simulatedNH[1]*this.nn.wh[1][0] + simulatedNH[2]*this.nn.wh[2][0] + simulatedNH[3]*this.nn.wh[3][0] + simulatedNH[4]*this.nn.wh[4][0],
-    //         simulatedNH[1]*this.nn.wh[0][1] + simulatedNH[1]*this.nn.wh[1][1] + simulatedNH[2]*this.nn.wh[2][1] + simulatedNH[3]*this.nn.wh[3][1] + simulatedNH[4]*this.nn.wh[4][1]
-    //     ]
-    //     console.log("simulatedNI : " +simulatedNI)
-    //     console.log("simulatedNH : " +simulatedNH)
-    //     console.log("simulatedNO : " +simulatedNO)
-    //     return simulatedNO
-    // }
+    }
 }
 
 // FUNCTION DEF
-const generateSphere = (sex, attractiveness, strength, speed, scene) => {
+const generateSphere = (sex, attractiveness, strength, speed, scene, NN) => {
     const ball = new Ball(
-        new THREE.Vector3(Math.random()*area-(area/2), .2, Math.random()*area-(area/2)),
+        new THREE.Vector3(Math.random() * area - (area / 2), .2, Math.random() * area - (area / 2)),
         Math.random() * (2 * Math.PI),
-        undefined,
+        undefined, // on génère le mesh juste après
         sex,
         attractiveness,
         strength,
-        speed
+        speed,
+        NN
     )
 
     ball.mesh = new THREE.Mesh(new THREE.SphereGeometry(ball.strength / 4 + .2, 8, 8), strengthMaterial)
@@ -157,13 +159,45 @@ const crossover = (super1, super2, scene, spheres) => {
     const kid1Stats = {
         attractiveness: random3() < .5 ? super1.attractiveness : super2.attractiveness,
         strength: random3() < .5 ? super1.strength : super2.strength,
-        speed: random3() < .5 ? super1.speed : super2.speed
+        speed: random3() < .5 ? super1.speed : super2.speed,
     }
 
     const kid2Stats = {
         attractiveness: random3() < .5 ? super1.attractiveness : super2.attractiveness,
         strength: random3() < .5 ? super1.strength : super2.strength,
         speed: random3() < .5 ? super1.speed : super2.speed
+    }
+
+    if (NN_WEIGHT_METHOD != "trained") {
+        kid1Stats.nn = {
+            w: [
+                [random3() < .5 ? super1.nn.w[0][0] : super2.nn.w[0][0], random3() < .5 ? super1.nn.w[0][1] : super2.nn.w[0][1], random3() < .5 ? super1.nn.w[0][2] : super2.nn.w[0][2], random3() < .5 ? super1.nn.w[0][3] : super2.nn.w[0][3], random3() < .5 ? super1.nn.w[0][4] : super2.nn.w[0][4]],
+                [random3() < .5 ? super1.nn.w[1][0] : super2.nn.w[1][0], random3() < .5 ? super1.nn.w[1][1] : super2.nn.w[1][1], random3() < .5 ? super1.nn.w[1][2] : super2.nn.w[1][2], random3() < .5 ? super1.nn.w[1][3] : super2.nn.w[1][3], random3() < .5 ? super1.nn.w[1][4] : super2.nn.w[1][4]],
+                [random3() < .5 ? super1.nn.w[2][0] : super2.nn.w[2][0], random3() < .5 ? super1.nn.w[2][1] : super2.nn.w[2][1], random3() < .5 ? super1.nn.w[2][2] : super2.nn.w[2][2], random3() < .5 ? super1.nn.w[2][3] : super2.nn.w[2][3], random3() < .5 ? super1.nn.w[2][4] : super2.nn.w[2][4]]
+            ],
+            wh: [
+                [random3() < .5 ? super1.nn.wh[0][0] : super2.nn.wh[0][0], random3() < .5 ? super1.nn.wh[0][1] : super2.nn.wh[0][1]],
+                [random3() < .5 ? super1.nn.wh[1][0] : super2.nn.wh[1][0], random3() < .5 ? super1.nn.wh[1][1] : super2.nn.wh[1][1]],
+                [random3() < .5 ? super1.nn.wh[2][0] : super2.nn.wh[2][0], random3() < .5 ? super1.nn.wh[2][1] : super2.nn.wh[2][1]],
+                [random3() < .5 ? super1.nn.wh[3][0] : super2.nn.wh[3][0], random3() < .5 ? super1.nn.wh[3][1] : super2.nn.wh[3][1]],
+                [random3() < .5 ? super1.nn.wh[4][0] : super2.nn.wh[4][0], random3() < .5 ? super1.nn.wh[4][1] : super2.nn.wh[4][1]]
+            ]
+        }
+
+        kid2Stats.nn = {
+            w: [
+                [random3() < .5 ? super1.nn.w[0][0] : super2.nn.w[0][0], random3() < .5 ? super1.nn.w[0][1] : super2.nn.w[0][1], random3() < .5 ? super1.nn.w[0][2] : super2.nn.w[0][2], random3() < .5 ? super1.nn.w[0][3] : super2.nn.w[0][3], random3() < .5 ? super1.nn.w[0][4] : super2.nn.w[0][4]],
+                [random3() < .5 ? super1.nn.w[1][0] : super2.nn.w[1][0], random3() < .5 ? super1.nn.w[1][1] : super2.nn.w[1][1], random3() < .5 ? super1.nn.w[1][2] : super2.nn.w[1][2], random3() < .5 ? super1.nn.w[1][3] : super2.nn.w[1][3], random3() < .5 ? super1.nn.w[1][4] : super2.nn.w[1][4]],
+                [random3() < .5 ? super1.nn.w[2][0] : super2.nn.w[2][0], random3() < .5 ? super1.nn.w[2][1] : super2.nn.w[2][1], random3() < .5 ? super1.nn.w[2][2] : super2.nn.w[2][2], random3() < .5 ? super1.nn.w[2][3] : super2.nn.w[2][3], random3() < .5 ? super1.nn.w[2][4] : super2.nn.w[2][4]]
+            ],
+            wh: [
+                [random3() < .5 ? super1.nn.wh[0][0] : super2.nn.wh[0][0], random3() < .5 ? super1.nn.wh[0][1] : super2.nn.wh[0][1]],
+                [random3() < .5 ? super1.nn.wh[1][0] : super2.nn.wh[1][0], random3() < .5 ? super1.nn.wh[1][1] : super2.nn.wh[1][1]],
+                [random3() < .5 ? super1.nn.wh[2][0] : super2.nn.wh[2][0], random3() < .5 ? super1.nn.wh[2][1] : super2.nn.wh[2][1]],
+                [random3() < .5 ? super1.nn.wh[3][0] : super2.nn.wh[3][0], random3() < .5 ? super1.nn.wh[3][1] : super2.nn.wh[3][1]],
+                [random3() < .5 ? super1.nn.wh[4][0] : super2.nn.wh[4][0], random3() < .5 ? super1.nn.wh[4][1] : super2.nn.wh[4][1]]
+            ]
+        }
     }
 
     if (kid1Stats.attractiveness == super1.attractiveness) kid2Stats.attractiveness = super2.attractiveness
@@ -175,10 +209,20 @@ const crossover = (super1, super2, scene, spheres) => {
     if (kid1Stats.speed == super1.speed) kid2Stats.speed = super2.speed
     else kid2Stats.speed = super1.speed
 
-    let kid1 = generateSphere(Math.random() <= sexDistrib ? "M" : "F", kid1Stats.attractiveness, kid1Stats.strength, kid1Stats.speed, scene)
-    let kid2 = generateSphere(Math.random() <= sexDistrib ? "M" : "F", kid2Stats.attractiveness, kid2Stats.strength, kid2Stats.speed, scene)
+    let kid1 = generateSphere(Math.random() <= sexDistrib ? "M" : "F", kid1Stats.attractiveness, kid1Stats.strength, kid1Stats.speed, scene, kid1Stats.nn)
+    let kid2 = generateSphere(Math.random() <= sexDistrib ? "M" : "F", kid2Stats.attractiveness, kid2Stats.strength, kid2Stats.speed, scene, kid2Stats.nn)
 
     Math.floor(Math.random()) < .5 ? mutation(kid1) : mutation(kid2)
+
+    if (NN_WEIGHT_METHOD != "trained") {
+        NNMutation(kid1)
+        NNMutation(kid2)
+    }
+
+    // console.log("super1 nn : ", super1.nn)
+    // console.log("super2 nn : ", super2.nn)
+    // console.log("kid1 nn : ", kid1.nn)
+    // console.log("kid2 nn : ", kid2.nn)
 
     spheres.push(kid1)
     spheres.push(kid2)
@@ -209,6 +253,17 @@ const mutation = (kid) => {
     if (statIndex == 0) kid.attractiveness = random3()
     else if (statIndex == 1) kid.strength = random3()
     else if (statIndex == 2) kid.speed = random3()
+}
+
+const NNMutation = (kid) => {
+    const layerIndex = Math.floor(Math.random() * 2)
+    if (layerIndex == 0) {
+        const weightIndex = [Math.floor(Math.random() * 3), Math.floor(Math.random() * 5)] // [0~2, 0~4]
+        kid.nn.w[weightIndex[0]][weightIndex[1]] = random3()
+    } else if (layerIndex == 1) {
+        const weightIndex = [Math.floor(Math.random() * 5), Math.floor(Math.random() * 1)] // [0~4, 0~1]
+        kid.nn.wh[weightIndex[0]][weightIndex[1]] = random3()
+    }
 }
 
 const meet = (ball1, ball2, index1, index2, scene, spheres) => {
@@ -242,7 +297,7 @@ function moveSpheres(spheres) {
 
         if (ball.pos.distanceTo(new THREE.Vector3(0, .2, 0)) > area) {
             let angle = Math.atan2(ball.pos.z, ball.pos.x)
-            ball.angle = angle + Math.PI + ((Math.random()-.5)/2)
+            ball.angle = angle + Math.PI + ((Math.random() - .5) / 2)
         }
 
         // Update the position of the mesh
@@ -262,14 +317,14 @@ function NNchange(ball1, ball2) {
     ball1.nn.ni[1] = ball1.relativeSpeed(ball2)
     ball1.nn.ni[2] = ball1.sexualityOf(ball2)
 
-    ball1.nn.nh[0] = ball1.nn.ni[0]*ball1.nn.w[0][0] + ball1.nn.ni[1]*ball1.nn.w[1][0] + ball1.nn.ni[2]*ball1.nn.w[2][0]
-    ball1.nn.nh[1] = ball1.nn.ni[0]*ball1.nn.w[0][1] + ball1.nn.ni[1]*ball1.nn.w[1][1] + ball1.nn.ni[2]*ball1.nn.w[2][1]
-    ball1.nn.nh[2] = ball1.nn.ni[0]*ball1.nn.w[0][2] + ball1.nn.ni[1]*ball1.nn.w[1][2] + ball1.nn.ni[2]*ball1.nn.w[2][2]
-    ball1.nn.nh[3] = ball1.nn.ni[0]*ball1.nn.w[0][3] + ball1.nn.ni[1]*ball1.nn.w[1][3] + ball1.nn.ni[2]*ball1.nn.w[2][3]
-    ball1.nn.nh[4] = ball1.nn.ni[0]*ball1.nn.w[0][4] + ball1.nn.ni[1]*ball1.nn.w[1][4] + ball1.nn.ni[2]*ball1.nn.w[2][4]
+    ball1.nn.nh[0] = ball1.nn.ni[0] * ball1.nn.w[0][0] + ball1.nn.ni[1] * ball1.nn.w[1][0] + ball1.nn.ni[2] * ball1.nn.w[2][0]
+    ball1.nn.nh[1] = ball1.nn.ni[0] * ball1.nn.w[0][1] + ball1.nn.ni[1] * ball1.nn.w[1][1] + ball1.nn.ni[2] * ball1.nn.w[2][1]
+    ball1.nn.nh[2] = ball1.nn.ni[0] * ball1.nn.w[0][2] + ball1.nn.ni[1] * ball1.nn.w[1][2] + ball1.nn.ni[2] * ball1.nn.w[2][2]
+    ball1.nn.nh[3] = ball1.nn.ni[0] * ball1.nn.w[0][3] + ball1.nn.ni[1] * ball1.nn.w[1][3] + ball1.nn.ni[2] * ball1.nn.w[2][3]
+    ball1.nn.nh[4] = ball1.nn.ni[0] * ball1.nn.w[0][4] + ball1.nn.ni[1] * ball1.nn.w[1][4] + ball1.nn.ni[2] * ball1.nn.w[2][4]
 
-    ball1.nn.no[0] = ball1.nn.nh[0]*ball1.nn.wh[0][0] + ball1.nn.nh[1]*ball1.nn.wh[1][0] * ball1.nn.nh[2]*ball1.nn.wh[2][0] + ball1.nn.nh[3]*ball1.nn.wh[3][0] + ball1.nn.nh[4]*ball1.nn.wh[4][0]
-    ball1.nn.no[1] = ball1.nn.nh[0]*ball1.nn.wh[0][1] + ball1.nn.nh[1]*ball1.nn.wh[1][1] * ball1.nn.nh[2]*ball1.nn.wh[2][1] + ball1.nn.nh[3]*ball1.nn.wh[3][1] + ball1.nn.nh[4]*ball1.nn.wh[4][1]
+    ball1.nn.no[0] = ball1.nn.nh[0] * ball1.nn.wh[0][0] + ball1.nn.nh[1] * ball1.nn.wh[1][0] * ball1.nn.nh[2] * ball1.nn.wh[2][0] + ball1.nn.nh[3] * ball1.nn.wh[3][0] + ball1.nn.nh[4] * ball1.nn.wh[4][0]
+    ball1.nn.no[1] = ball1.nn.nh[0] * ball1.nn.wh[0][1] + ball1.nn.nh[1] * ball1.nn.wh[1][1] * ball1.nn.nh[2] * ball1.nn.wh[2][1] + ball1.nn.nh[3] * ball1.nn.wh[3][1] + ball1.nn.nh[4] * ball1.nn.wh[4][1]
 }
 
 
@@ -282,12 +337,12 @@ function checkCollisions(spheres, scene) {
 
                 const distance = ball1.pos.distanceTo(ball2.pos);
                 const sumRadii = ball1.mesh.geometry.parameters.radius + ball2.mesh.geometry.parameters.radius;
-                
-                NNchange(ball1, ball2)
-                // console.log(ball1.nn.no)
 
-                if (ball1.speed > minSpeed && ball1.speed < maxSpeed) ball1.speed += ball1.nn.no[0]/1000;
-                ball1.angle += ball1.nn.no[1]/500
+                NNchange(ball1, ball2)
+                    // console.log(ball1.nn.no)
+
+                if (ball1.speed > minSpeed && ball1.speed < maxSpeed) ball1.speed += ball1.nn.no[0] / 1000;
+                ball1.angle += ball1.nn.no[1] / 500
 
 
                 if (distance < sumRadii) {
@@ -324,7 +379,7 @@ function NNForward(ball, inputs) {
         for (let j = 0; j < ball.nn.ni.length; j++) {
             ball.nn.nh[i] += ball.nn.ni[j] * ball.nn.w[j][i];
         }
-        ball.nn.nh[i] = sigmoid(ball.nn.nh[i]);  // Applique une fonction d'activation, par exemple sigmoid
+        ball.nn.nh[i] = sigmoid(ball.nn.nh[i]); // Applique une fonction d'activation, par exemple sigmoid
     }
 
     for (let i = 0; i < ball.nn.no.length; i++) {
@@ -332,7 +387,7 @@ function NNForward(ball, inputs) {
         for (let j = 0; j < ball.nn.nh.length; j++) {
             ball.nn.no[i] += ball.nn.nh[j] * ball.nn.wh[j][i];
         }
-        ball.nn.no[i] = sigmoid(ball.nn.no[i]);  // Applique une fonction d'activation, par exemple sigmoid
+        ball.nn.no[i] = sigmoid(ball.nn.no[i]); // Applique une fonction d'activation, par exemple sigmoid
     }
 
     return ball.nn.no
@@ -349,7 +404,7 @@ function NNBackward(ball, loss) {
     // Calcul des gradients pour les poids entre les neurones de sortie et les neurones cachés
     for (let i = 0; i < ball.nn.wh.length; i++) {
         for (let j = 0; j < ball.nn.wh[i].length; j++) {
-            let delta = ball.nn.no[j] * (1 - ball.nn.no[j]) * loss;  // Dérivée de la fonction d'activation
+            let delta = ball.nn.no[j] * (1 - ball.nn.no[j]) * loss; // Dérivée de la fonction d'activation
             ball.nn.wh[i][j] -= ball.nn.nh[i] * delta;
         }
     }
@@ -361,7 +416,7 @@ function NNBackward(ball, loss) {
             for (let k = 0; k < ball.nn.no.length; k++) {
                 sum += ball.nn.wh[j][k] * (ball.nn.no[k] * (1 - ball.nn.no[k]) * loss);
             }
-            let delta = ball.nn.nh[j] * (1 - ball.nn.nh[j]) * sum;  // Dérivée de la fonction d'activation
+            let delta = ball.nn.nh[j] * (1 - ball.nn.nh[j]) * sum; // Dérivée de la fonction d'activation
             ball.nn.w[i][j] -= ball.nn.ni[i] * delta;
         }
     }

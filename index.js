@@ -34,10 +34,6 @@ scene.add(camera)
 
 
 
-
-
-
-
 // ACTUAL CODE
 // ----------------------------------------------------------------
 
@@ -50,7 +46,7 @@ groundMesh.position.y -= 2.5
 scene.add(groundMesh)
 
 const dome = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
-const domeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, opacity:.3, transparent: true})
+const domeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, opacity: .3, transparent: true })
 const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
@@ -71,9 +67,9 @@ scene.add(domeMesh)
 //     structure.scale.x *= 25 * (1-(distanceToCenter/26))
 //     structure.scale.y *= 25 * (1-(distanceToCenter/26))
 //     structure.scale.z *= 25 * (1-(distanceToCenter/26))
-    
+
 //     structure.position.y += 22 * (1-(distanceToCenter/26))
-    
+
 //     scene.add(structure)
 // }
 
@@ -110,25 +106,24 @@ scene.add(domeMesh)
 // voroways.position.y += .1
 // scene.add(voroways)
 
-// LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES
+// LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION J'ESPERE
 var spheres = []
 for (let i = 0; i < 50; i++) {
     spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 }
 
-// Utilisation de la fonction d'entraînement
-// const trainingData = [
-//     {
-//         inputs: [1.0, 0.5, 1.0],  // Exemple de deux femelles se rapprochant
-//         expectedOutputs: [0.8, 0.2],  // Les sorties attendues selon ton objectif
+// // Utilisation de la fonction d 'entraînement
+// const trainingData = [{
+//         inputs: [1.0, 0.5, 1.0], // Exemple de deux femelles se rapprochant
+//         expectedOutputs: [1, 0], // Les sorties attendues selon ton objectif
 //     },
 //     {
-//         inputs: [0.5, -0.2, -1.0],  // Exemple d'un mâle et une femelle se rapprochant
-//         expectedOutputs: [0.7, 0.3],  // Les sorties attendues selon ton objectif
+//         inputs: [0.5, -0.2, -1.0], // Exemple d'un mâle et une femelle se rapprochant
+//         expectedOutputs: [1, 0], // Les sorties attendues selon ton objectif
 //     },
 //     {
-//         inputs: [0.8, 0.1, -1.0],  // Exemple de deux mâles s'évitant
-//         expectedOutputs: [0.2, 0.8],  // Les sorties attendues selon ton objectif
+//         inputs: [0.8, 0.1, -1.0], // Exemple de deux mâles s'évitant
+//         expectedOutputs: [0, 1], // Les sorties attendues selon ton objectif
 //     },
 // ];
 
@@ -139,11 +134,11 @@ for (let i = 0; i < 50; i++) {
 
 // spheres.map(s => {
 //     console.log("Avant entraînement : ", s.nn);
-    
-//     for (let epoch = 0; epoch < 1000; epoch++) {
+
+//     for (let epoch = 0; epoch < 10000; epoch++) {
 //         for (let i = 0; i < trainingData.length; i++) {
 //             const example = trainingData[i];
-            
+
 //             // Exécute la fonction d'entraînement avec l'exemple actuel
 //             trainNetwork(s, example.inputs, example.expectedOutputs, learningRate);
 //         }

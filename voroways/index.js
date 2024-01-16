@@ -86,12 +86,12 @@ var vertices = d3.range(cells).map(function(d) {
     // console.log(gaussianRandom())
     const x = radius * Math.cos(angle)
     const y = radius * Math.sin(angle)
-    // console.log(x, y)
+        // console.log(x, y)
     if (x < 20 && y < 20 && x > -20 && y > -20) selectedPositions.push([x, y])
     return [x, y];
 });
 
-console.log(selectedPositions)
+// console.log(selectedPositions)
 
 var delaunay = d3.Delaunay.from(vertices);
 // console.log(delaunay)
@@ -120,16 +120,16 @@ let mat = new THREE.LineBasicMaterial()
 polygons.map(poly => {
     let points = []
     poly.map(ver => {
-        // console.log(ver[0], ver[1])
-        const distanceFromCenter = Math.sqrt((ver[0]-0)*(ver[0]-0) + (ver[1]-0)*(ver[1]-0))
-        // console.log(distanceFromCenter)
-        if (distanceFromCenter < maxSize) points.push(new THREE.Vector3(ver[0], 0, ver[1]))
-        // if ((ver[0] < maxSize && ver[0] > -maxSize) && (ver[1] < maxSize && ver[1] > -maxSize)) points.push(new THREE.Vector3(ver[0], 0, ver[1]))
+            // console.log(ver[0], ver[1])
+            const distanceFromCenter = Math.sqrt((ver[0] - 0) * (ver[0] - 0) + (ver[1] - 0) * (ver[1] - 0))
+                // console.log(distanceFromCenter)
+            if (distanceFromCenter < maxSize) points.push(new THREE.Vector3(ver[0], 0, ver[1]))
+                // if ((ver[0] < maxSize && ver[0] > -maxSize) && (ver[1] < maxSize && ver[1] > -maxSize)) points.push(new THREE.Vector3(ver[0], 0, ver[1]))
 
-    })
-    // const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    // const line = new THREE.Line(geometry, mat);
-    // scene.add(line)
+        })
+        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        // const line = new THREE.Line(geometry, mat);
+        // scene.add(line)
     drawAllPlanes(points)
 })
 
@@ -160,4 +160,4 @@ polygons.map(poly => {
 // on applique des règles autant de fois qu'on a défini d'itérations 
 // animate();
 
-export {voroways, selectedPositions}
+export { voroways, selectedPositions }
