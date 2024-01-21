@@ -7,7 +7,10 @@ import { conwayStructure } from './conway_structures/index.js'
 import { fancySnowflake } from './fancy_snowflakes/index.js'
 import { lUrban } from "./l-urban/index.js";
 import { voroways, selectedPositions } from "./voroways/index.js";
-import { moveSpheres, checkCollisions, generateSphere, trainNetwork } from "./living-balls/index.js";
+import { moveSpheres, checkCollisions, generateSphere, trainNetwork, death } from "./living-balls/index.js";
+
+// PARAMETERS
+const nbBalls = 50
 
 // BASIC SETUP
 
@@ -108,9 +111,7 @@ scene.add(domeMesh)
 
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION J'ESPERE
 var spheres = []
-for (let i = 0; i < 50; i++) {
-    spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
-}
+for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
 // // Utilisation de la fonction d 'entraînement
 // const trainingData = [{
@@ -170,6 +171,14 @@ function animate() {
     moveSpheres(spheres)
     spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
+
+    spheres.map((ball, id) => {
+        if (ball.life <= 0) death(ball, id, scene, spheres)
+        ball.life--
+        ball.mesh.scale.y = ball.life*2/1500
+    })
+
+    if (spheres.length == 0) for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
     // snowflakes.map(sf => {
     //     sf.position.y -= .02

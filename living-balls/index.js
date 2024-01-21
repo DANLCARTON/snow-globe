@@ -21,10 +21,11 @@ const minAttractivenessNecessary = 0.4
 const attractivenessBoost = 0.001
 const maxSpeed = 2
 const minSpeed = 0.1
+const maxHP = 1500
 
 
-const attractivenessMaterial = new THREE.MeshPhongMaterial({ color: 0xffdddd })
-const strengthMaterial = new THREE.MeshPhongMaterial({ color: 0xddffdd })
+const attractivenessMaterial = new THREE.MeshPhongMaterial({ color: 0xffeeee })
+const strengthMaterial = new THREE.MeshPhongMaterial({ color: 0xeeffee })
 const basicMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff })
 const maleGeometry = new THREE.BoxGeometry(.4, .4, .4)
 const femaleGeometry = new THREE.SphereGeometry(.2, 8, 8)
@@ -52,6 +53,7 @@ class Ball {
         this.attractiveness = attractiveness
         this.strength = strength
         this.speed = speed
+        this.life = maxHP
         if (inheritedNNWeights !== undefined) {
             this.nn = new NN(
                 [0, 0, 0],
@@ -219,30 +221,44 @@ const crossover = (super1, super2, scene, spheres) => {
         NNMutation(kid2)
     }
 
-    // console.log("super1 nn : ", super1.nn)
-    // console.log("super2 nn : ", super2.nn)
-    // console.log("kid1 nn : ", kid1.nn)
-    // console.log("kid2 nn : ", kid2.nn)
-
     spheres.push(kid1)
     spheres.push(kid2)
+
+    super1.life < maxHP-1000 ? super1.life += 1000 : super1.life = maxHP
+    super2.life < maxHP-1000 ? super2.life += 1000 : super2.life = maxHP
 }
 
 const fight = (ball1, ball2, index1, index2, scene, spheres) => {
     if (ball1.strength > ball2.strength) {
         spheres.splice(index2, 1)
         scene.remove(ball2.mesh)
-        console.log("💀", ball2.id, "was slain by", ball1.id)
+        console.log("🪓", ball2.id, "was slain by", ball1.id)
+        ball1.life < maxHP-500 ? ball1.life += 500 : ball1.life = maxHP
     } else {
         spheres.splice(index1, 1)
         scene.remove(ball1.mesh)
-        console.log("💀", ball1.id, "was slain by", ball2.id)
+        console.log("🪓", ball1.id, "was slain by", ball2.id)
+        ball2.life < maxHP-500 ? ball2.life += 500 : ball2.life = maxHP
     }
 }
 
+const death = (ball, index, scene, shperes) => {
+    shperes.splice(index, 1)
+    scene.remove(ball.mesh)
+    console.log("💀", ball.id, "died of old age")
+}
+
 const enhanceAttractiveness = (ball1, ball2) => {
-    ball1.attractiveness < ball2.attractiveness ? console.log("👏", ball2.id, "makes", ball1.id, "more attractive") : console.log("👏", ball1.id, "makes", ball2.id, "more attractive")
-    ball1.attractiveness < ball2.attractiveness ? ball1.attractiveness += attractivenessBoost : ball2.attractiveness += attractivenessBoost
+    if (ball1.attractiveness < ball2.attractiveness) {
+        console.log("👏", ball2.id, "makes", ball1.id, "more attractive")
+        ball1.attractiveness += attractivenessBoost
+        ball2.life < maxHP-20 ? ball2.life += 20 : ball2.life = maxHP
+    } else {
+        console.log("👏", ball1.id, "makes", ball2.id, "more attractive")
+        ball2.attractiveness += attractivenessBoost
+        ball1.life < maxHP-20 ? ball1.life += 20 : ball1.life = maxHP
+    }
+
     ball1.mesh.children[0].scale.set(1 + ball1.attractiveness / 4 + 0.2, 1 + ball1.attractiveness / 4 + 0.2, 1 + ball1.attractiveness / 4 + 0.2);
     ball2.mesh.children[0].scale.set(1 + ball2.attractiveness / 4 + 0.2, 1 + ball2.attractiveness / 4 + 0.2, 1 + ball2.attractiveness / 4 + 0.2);
 }
@@ -465,4 +481,4 @@ function updateWeights(ball, learningRate) {
 
 
 
-export { moveSpheres, checkCollisions, generateSphere, trainNetwork }
+export { moveSpheres, checkCollisions, generateSphere, trainNetwork, death }
