@@ -6,9 +6,7 @@ A FAIRE
 - Textures
 - Chaine de Markov (nuages avec les fractales, pluie petit mesh de merde, neige fractales, éclairs à voir peut-être l-system)
 - donner aux créature une espérence de vie et la prendre en compte dans leur NN (entraînement et neuroévolution)
-- quand deux créature se reproduisent elles regagnent leur espérence de vie
-- mettre la distance sur une échelle de 0 à 1 pour les neurones
-- pareil pour la vitesse relative entre -1 et 1
+- abandonner le système d'évolution actuel et le faire à la main parce que y'a rien qui va je crois
 
 SI ON A LE TEMPS
 - Vent

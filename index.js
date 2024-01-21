@@ -40,7 +40,7 @@ scene.add(camera)
 // ACTUAL CODE
 // ----------------------------------------------------------------
 
-const ground = new THREE.CylinderGeometry(26, 26, 5, 64)
+const ground = new THREE.CylinderGeometry(26, 20, 5, 64)
 const groundMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide })
 const groundMesh = new THREE.Mesh(ground, groundMaterial)
 groundMesh.receiveShadow = false;
@@ -113,30 +113,32 @@ scene.add(domeMesh)
 var spheres = []
 for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
+// console.log(spheres)
+
 // // Utilisation de la fonction d 'entraînement
 // const trainingData = [{
-//         inputs: [1.0, 0.5, 1.0], // Exemple de deux femelles se rapprochant
+//         inputs: [0.5, -1.0, 1.0], // Un individu se rapprochant d'une femelle
 //         expectedOutputs: [1, 0], // Les sorties attendues selon ton objectif
 //     },
 //     {
-//         inputs: [0.5, -0.2, -1.0], // Exemple d'un mâle et une femelle se rapprochant
-//         expectedOutputs: [1, 0], // Les sorties attendues selon ton objectif
+//         inputs: [0.5, 1.0, 1.0], // Un individu s'éloignant d'une femelle
+//         expectedOutputs: [.5, 1], // Les sorties attendues selon ton objectif
 //     },
 //     {
-//         inputs: [0.8, 0.1, -1.0], // Exemple de deux mâles s'évitant
-//         expectedOutputs: [0, 1], // Les sorties attendues selon ton objectif
+//         inputs: [0.8, 0.5, -1.0], // deux mâles se rapprochent
+//         expectedOutputs: [.5, 1], // Les sorties attendues selon ton objectif
 //     },
 // ];
 
 // // Taux d'apprentissage
-// const learningRate = 0.01;
+// const learningRate = 0.00000001;
 
 // // Entraînement du réseau avec les scénarios définis
 
 // spheres.map(s => {
 //     console.log("Avant entraînement : ", s.nn);
 
-//     for (let epoch = 0; epoch < 10000; epoch++) {
+//     for (let epoch = 0; epoch < 1000000; epoch++) {
 //         for (let i = 0; i < trainingData.length; i++) {
 //             const example = trainingData[i];
 

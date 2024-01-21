@@ -65,17 +65,17 @@ class Ball {
                 this.nn = new NN(
                     [0, 0, 0], // neurones d'entrée
                     [
-                        [0.6076265902187002, 0.6076265902187002, 0.6076265902187002, 0.6076265902187002, 0.6076265902187002], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
-                        [0.11063947182581162, 0.11063947182581162, 0.11063947182581162, 0.11063947182581162, 0.11063947182581162], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
-                        [-0.20856988200792137, -0.20856988200792137, -0.20856988200792137, -0.20856988200792137, -0.20856988200792137] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
+                        [0.55905, 0.55905, 0.55905, 0.55905, 0.55905], // W_NI_0_0, W_NI_0_1, W_NI_0_2, W_NI_0_3, W_NI_0_4 
+                        [0.10539, 0.10539, 0.10539, 0.10539, 0.10539], // W_NI_1_0, W_NI_1_1, W_NI_1_2, W_NI_1_3, W_NI_1_4
+                        [0.19750, 0.19750, 0.19750, 0.19750, 0.19750] // W_NI_2_0, W_NI_2_1, W_NI_2_2, W_NI_2_3, W_NI_2_4
                     ], // poids des neurones d'entrée
                     [0, 0, 0, 0, 0], // neurones cachés
                     [
-                        [-1.031484159491216, -1.031484159491216], // W_NH_0_0, N_NH_0_1
-                        [-1.031484159491216, -1.031484159491216], // W_NH_1_0, N_NH_1_1
-                        [-1.031484159491216, -1.031484159491216], // W_NH_2_0, N_NH_2_1
-                        [-1.031484159491216, -1.031484159491216], // W_NH_3_0, N_NH_3_1
-                        [-1.031484159491216, -1.031484159491216] // W_NH_4_0, N_NH_4_1
+                        [-1.05700, -1.05700], // W_NH_0_0, N_NH_0_1
+                        [-1.05700, -1.05700], // W_NH_1_0, N_NH_1_1
+                        [-1.05700, -1.05700], // W_NH_2_0, N_NH_2_1
+                        [-1.05700, -1.05700], // W_NH_3_0, N_NH_3_1
+                        [-1.05700, -1.05700] // W_NH_4_0, N_NH_4_1
                     ], // poids des neurones cachés
                     [0, 0] // neurones de sortie
                 )
@@ -149,6 +149,8 @@ const generateSphere = (sex, attractiveness, strength, speed, scene, NN) => {
 
     ball.mesh.castShadow = false;
     ball.mesh.receiveShadow = false;
+
+    ball.mesh.add(new THREE.AxesHelper(1))
 
     scene.add(ball.mesh)
 
@@ -318,6 +320,7 @@ function moveSpheres(spheres) {
 
         // Update the position of the mesh
         ball.mesh.position.copy(ball.pos);
+        ball.mesh.rotation.y = -ball.angle
     }
 }
 
@@ -329,8 +332,8 @@ function drawSpheres() {
 }
 
 function NNchange(ball1, ball2) {
-    ball1.nn.ni[0] = ball1.distance(ball2)
-    ball1.nn.ni[1] = ball1.relativeSpeed(ball2)
+    ball1.nn.ni[0] = ball1.distance(ball2) / 52 // 52 étant la distance max mesurable en théorie ça permet d'avoir une valeur entre 0 et 1
+    ball1.nn.ni[1] = ball1.relativeSpeed(ball2)  / (maxSpeed*2) // la vitesse relative maximale entre deux individus est de 2 * maxspeed cela permet des valeurs entre -1 et 1
     ball1.nn.ni[2] = ball1.sexualityOf(ball2)
 
     ball1.nn.nh[0] = ball1.nn.ni[0] * ball1.nn.w[0][0] + ball1.nn.ni[1] * ball1.nn.w[1][0] + ball1.nn.ni[2] * ball1.nn.w[2][0]
@@ -358,8 +361,7 @@ function checkCollisions(spheres, scene) {
                     // console.log(ball1.nn.no)
 
                 if (ball1.speed > minSpeed && ball1.speed < maxSpeed) ball1.speed += ball1.nn.no[0] / 1000;
-                ball1.angle += ball1.nn.no[1] / 500
-
+                ball1.angle += ball1.nn.no[1] / 50
 
                 if (distance < sumRadii) {
                     meet(ball1, ball2, i, j, scene, spheres)
