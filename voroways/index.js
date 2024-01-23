@@ -10,15 +10,30 @@ const maxSize = 25
 const cells = 50
 
 // textures
-const texture = new THREE.TextureLoader().load("./voroways/road.png")
-texture.wrapS = THREE.RepeatWrapping
-texture.wrapT = THREE.RepeatWrapping
-texture.rotation = Math.PI / 2
-texture.repeat.set(1, 5)
+const roadTexture = new THREE.TextureLoader().load("./assets/road")
+roadTexture.wrapS = THREE.RepeatWrapping
+roadTexture.wrapT = THREE.RepeatWrapping;
+// texture.rotation = Math.PI / 2
+roadTexture.repeat.set(1, 1)
+
+const urbanTexture = new THREE.TextureLoader().load("./assets/snowy-ground")
+urbanTexture.wrapS = THREE.RepeatWrapping;
+urbanTexture.wrapT = THREE.RepeatWrapping;
+urbanTexture.repeat.set(0.21, 0.21)
+
+const lakeTexture = new THREE.TextureLoader().load("./assets/lake")
+lakeTexture.wrapS = THREE.RepeatWrapping;
+lakeTexture.wrapT = THREE.RepeatWrapping;
+lakeTexture.repeat.set(0.21, 0.21)
 
 // géométires et matériaux
 const planeGeometry = new THREE.PlaneGeometry(1, 1)
-const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.BackSide, map: texture })
+const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.BackSide, map: roadTexture })
+
+// const urbanMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: urbanTexture })
+const urbanMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: urbanTexture })
+
+const lakeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: lakeTexture })
 
 // définition de la scene et de la caméra
 // const scene = new THREE.Scene();
@@ -42,7 +57,6 @@ let voroways = new THREE.Mesh()
 
 // FUCTIONS
 // ---------------------------------------------------------------
-
 const drawAllPlanes = (points) => {
     for (let i = 1; i < points.length; i++) {
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -113,25 +127,97 @@ const polygons = Array.from(voronoi.cellPolygons());
 
 // scene.add(object);
 
+const wholePolyInRadius = (poly) => {
+    const allPointsInRadius = poly.every(coord => {
+        const distanceFromCenter = Math.sqrt((coord[0] - 0) ** 2 + (coord[1] - 0) ** 2);
+        return distanceFromCenter < maxSize;
+    });
+    return allPointsInRadius;
+};
+
 // ACTUAL CODE
 // ----------------------------------------------------------------
 
 let mat = new THREE.LineBasicMaterial()
 polygons.map(poly => {
     let points = []
-    poly.map(ver => {
-            // console.log(ver[0], ver[1])
-            const distanceFromCenter = Math.sqrt((ver[0] - 0) * (ver[0] - 0) + (ver[1] - 0) * (ver[1] - 0))
-                // console.log(distanceFromCenter)
-            if (distanceFromCenter < maxSize) points.push(new THREE.Vector3(ver[0], 0, ver[1]))
-                // if ((ver[0] < maxSize && ver[0] > -maxSize) && (ver[1] < maxSize && ver[1] > -maxSize)) points.push(new THREE.Vector3(ver[0], 0, ver[1]))
-
+    if (wholePolyInRadius(poly)) {
+        poly.map(ver => {
+            points.push(new THREE.Vector3(ver[0], 0, ver[1]));
         })
-        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        // const line = new THREE.Line(geometry, mat);
-        // scene.add(line)
+    }
     drawAllPlanes(points)
 })
+
+
+
+var lake = 0
+
+polygons.map(poly => {
+    // console.log(poly)
+    // const polyPoints = []
+
+    // poly.map(coord => {
+    //     polyPoints.push(new THREE.Vector2(coord[0], coord[1]))
+    // })
+    // var polyShape = new THREE.Shape(polyPoints)
+    // const polyGeometry = new THREE.ShapeGeometry(polyShape)
+    // const polyMesh = new THREE.Mesh(polyGeometry, urbanMaterial)
+    // voroways.add(polyMesh)
+
+    // if (poly.index == 0) {
+    //     const polyGeometry = new THREE.BufferGeometry();
+
+    //     const vertices = [];
+
+    //     poly.map(coord => {
+    //         // console.log(coord)
+    //         vertices.push(coord[0], 0, coord[1]);
+    //     });
+
+    //     polyGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+    //     const polyMesh = new THREE.Mesh(polyGeometry, urbanMaterial);
+    //     polyMesh.position.y += 5
+    //     voroways.add(polyMesh);
+    // }
+
+    // if (poly.index == 0) {
+
+    var polyPoints = []
+    if (wholePolyInRadius(poly)) {
+        poly.map(coord => {
+            const distanceFromCenter = Math.sqrt((coord[0] - 0) * (coord[0] - 0) + (coord[1] - 0) * (coord[1] - 0))
+            if (distanceFromCenter < maxSize) polyPoints.push(new THREE.Vector2(coord[0], coord[1]))
+            else return
+        })
+        var polyShape = new THREE.Shape(polyPoints)
+        var extrusionSettings = {
+            size: 30,
+            height: 4,
+            curveSegments: 3,
+            bevelThickness: 1,
+            bevelSize: 2,
+            bevelEnabled: false,
+            material: 0,
+            extrudeMaterial: 1
+        };
+        var polyGeometry = new THREE.ExtrudeGeometry(polyShape, extrusionSettings);
+
+        if (lake < 2) {
+            var poly = new THREE.Mesh(polyGeometry, lakeMaterial);
+            lake++
+        } else {
+            var poly = new THREE.Mesh(polyGeometry, urbanMaterial);
+        }
+
+        poly.rotation.x += Math.PI / 2
+        poly.position.y -= 0.01
+        voroways.add(poly);
+    }
+})
+
+console.log(polygons[0])
 
 
 // const shape = new THREE.BoxGeometry(1, 1)

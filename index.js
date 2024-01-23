@@ -40,14 +40,31 @@ scene.add(camera)
 // ACTUAL CODE
 // ----------------------------------------------------------------
 
-const ground = new THREE.CylinderGeometry(26, 20, 5, 64)
-const groundMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+
+// SOCLE
+const base = new THREE.CylinderGeometry(26, 20, 5, 64)
+const baseMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+const baseMesh = new THREE.Mesh(base, baseMaterial)
+baseMesh.receiveShadow = false;
+// groundMesh.rotation.x = -Math.PI / 2
+baseMesh.position.y -= 2.5
+scene.add(baseMesh)
+
+// SOL
+const groundTexture = new THREE.TextureLoader().load("./assets/snowy-grass.jpg")
+groundTexture.wrapS = THREE.RepeatWrapping
+groundTexture.wrapT = THREE.RepeatWrapping;
+groundTexture.repeat.set(13, 13)
+
+const ground = new THREE.CircleGeometry(26, 64)
+const groundMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: groundTexture })
 const groundMesh = new THREE.Mesh(ground, groundMaterial)
 groundMesh.receiveShadow = false;
-// groundMesh.rotation.x = -Math.PI / 2
-groundMesh.position.y -= 2.5
+groundMesh.rotation.x = -Math.PI / 2
+groundMesh.position.y += 0.01
 scene.add(groundMesh)
 
+// DOME
 const dome = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
 const domeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, opacity: .3, transparent: true })
 const domeMesh = new THREE.Mesh(dome, domeMaterial)
@@ -105,13 +122,13 @@ scene.add(domeMesh)
 // lUrban.position.y += .1
 // scene.add(lUrban)
 
-// // VOROWAYS - DIAGRAMME DE VORONOI
-// voroways.position.y += .1
-// scene.add(voroways)
+// VOROWAYS - DIAGRAMME DE VORONOI
+voroways.position.y += .1
+scene.add(voroways)
 
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION J'ESPERE
-var spheres = []
-for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+// var spheres = []
+// for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
 // console.log(spheres)
 
@@ -170,17 +187,17 @@ function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
     controls.update();
-    moveSpheres(spheres)
-    spheres = checkCollisions(spheres, scene);
+    // moveSpheres(spheres)
+    // spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
 
-    spheres.map((ball, id) => {
-        if (ball.life <= 0) death(ball, id, scene, spheres)
-        ball.life--
-        ball.mesh.scale.y = ball.life*2/1500
-    })
+    // spheres.map((ball, id) => {
+    //     if (ball.life <= 0) death(ball, id, scene, spheres)
+    //     ball.life--
+    //     ball.mesh.scale.y = ball.life*2/1500
+    // })
 
-    if (spheres.length == 0) for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+    // if (spheres.length == 0) for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
     // snowflakes.map(sf => {
     //     sf.position.y -= .02
