@@ -12,6 +12,32 @@ console.log(NN_WEIGHT_METHOD);
 // la valeur "trained" va donner au créatures un réseau de neurones déjà entrainé
 // n'importe quelle autre valeur va leur donner des valeurs aléatoires et débloquer la fonction de neuroévolution
 
+// SETUP
+const snowmanTexture = new THREE.TextureLoader().load("./assets/snowman")
+snowmanTexture.wrapS = THREE.RepeatWrapping;
+snowmanTexture.wrapT = THREE.RepeatWrapping;
+snowmanTexture.repeat.set(1, 1)
+
+const snowmanZoomedOutTexture = new THREE.TextureLoader().load("./assets/snowman-zoomed-out")
+snowmanZoomedOutTexture.wrapS = THREE.RepeatWrapping;
+snowmanZoomedOutTexture.wrapT = THREE.RepeatWrapping;
+snowmanZoomedOutTexture.repeat.set(1, 1)
+
+const attractivenessMaterial = new THREE.MeshPhongMaterial({ color: 0xffeeee })
+const strengthMaterial = new THREE.MeshPhongMaterial({ color: 0xeeeeff })
+const basicMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, map: snowmanTexture })
+const maleHeadMaterial = [
+    new THREE.MeshPhongMaterial({ map: snowmanTexture }),
+    new THREE.MeshPhongMaterial({ color: 0xffffff }),
+    new THREE.MeshPhongMaterial({ color: 0xffffff }),
+    new THREE.MeshPhongMaterial({ color: 0xffffff }),
+    new THREE.MeshPhongMaterial({ color: 0xffffff }),
+    new THREE.MeshPhongMaterial({ color: 0xffffff })
+]
+const femaleHeadMaterial = new THREE.MeshPhongMaterial({ map: snowmanZoomedOutTexture })
+const maleGeometry = new THREE.BoxGeometry(.4, .4, .4)
+const femaleGeometry = new THREE.SphereGeometry(.2, 8, 8)
+
 // PARAMETRES VARIABLES
 let globalBallId = 0;
 
@@ -22,13 +48,6 @@ const attractivenessBoost = 0.001
 const maxSpeed = 2
 const minSpeed = 0.1
 const maxHP = 1500
-
-
-const attractivenessMaterial = new THREE.MeshPhongMaterial({ color: 0xffeeee })
-const strengthMaterial = new THREE.MeshPhongMaterial({ color: 0xeeffee })
-const basicMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff })
-const maleGeometry = new THREE.BoxGeometry(.4, .4, .4)
-const femaleGeometry = new THREE.SphereGeometry(.2, 8, 8)
 
 class NN {
     // constructor(ni, w, no, nh, nhw) {
@@ -141,7 +160,7 @@ const generateSphere = (sex, attractiveness, strength, speed, scene, NN) => {
     attractivenessBall.castShadow = false
     attractivenessBall.receiveShadow = false
 
-    const sexGeometry = new THREE.Mesh(ball.sex == "M" ? maleGeometry : femaleGeometry, basicMaterial)
+    const sexGeometry = new THREE.Mesh(ball.sex == "M" ? maleGeometry : femaleGeometry, ball.sex == "M" ? maleHeadMaterial : femaleHeadMaterial)
     sexGeometry.position.set(0, 1, 0)
     ball.mesh.add(sexGeometry)
     sexGeometry.castShadow = false
@@ -226,8 +245,8 @@ const crossover = (super1, super2, scene, spheres) => {
     spheres.push(kid1)
     spheres.push(kid2)
 
-    super1.life < maxHP-1000 ? super1.life += 1000 : super1.life = maxHP
-    super2.life < maxHP-1000 ? super2.life += 1000 : super2.life = maxHP
+    super1.life < maxHP - 1000 ? super1.life += 1000 : super1.life = maxHP
+    super2.life < maxHP - 1000 ? super2.life += 1000 : super2.life = maxHP
 }
 
 const fight = (ball1, ball2, index1, index2, scene, spheres) => {
@@ -235,12 +254,12 @@ const fight = (ball1, ball2, index1, index2, scene, spheres) => {
         spheres.splice(index2, 1)
         scene.remove(ball2.mesh)
         console.log("🪓", ball2.id, "was slain by", ball1.id)
-        ball1.life < maxHP-500 ? ball1.life += 500 : ball1.life = maxHP
+        ball1.life < maxHP - 500 ? ball1.life += 500 : ball1.life = maxHP
     } else {
         spheres.splice(index1, 1)
         scene.remove(ball1.mesh)
         console.log("🪓", ball1.id, "was slain by", ball2.id)
-        ball2.life < maxHP-500 ? ball2.life += 500 : ball2.life = maxHP
+        ball2.life < maxHP - 500 ? ball2.life += 500 : ball2.life = maxHP
     }
 }
 
@@ -254,11 +273,11 @@ const enhanceAttractiveness = (ball1, ball2) => {
     if (ball1.attractiveness < ball2.attractiveness) {
         console.log("👏", ball2.id, "makes", ball1.id, "more attractive")
         ball1.attractiveness += attractivenessBoost
-        ball2.life < maxHP-20 ? ball2.life += 20 : ball2.life = maxHP
+        ball2.life < maxHP - 20 ? ball2.life += 20 : ball2.life = maxHP
     } else {
         console.log("👏", ball1.id, "makes", ball2.id, "more attractive")
         ball2.attractiveness += attractivenessBoost
-        ball1.life < maxHP-20 ? ball1.life += 20 : ball1.life = maxHP
+        ball1.life < maxHP - 20 ? ball1.life += 20 : ball1.life = maxHP
     }
 
     ball1.mesh.children[0].scale.set(1 + ball1.attractiveness / 4 + 0.2, 1 + ball1.attractiveness / 4 + 0.2, 1 + ball1.attractiveness / 4 + 0.2);
@@ -333,7 +352,7 @@ function drawSpheres() {
 
 function NNchange(ball1, ball2) {
     ball1.nn.ni[0] = ball1.distance(ball2) / 52 // 52 étant la distance max mesurable en théorie ça permet d'avoir une valeur entre 0 et 1
-    ball1.nn.ni[1] = ball1.relativeSpeed(ball2)  / (maxSpeed*2) // la vitesse relative maximale entre deux individus est de 2 * maxspeed cela permet des valeurs entre -1 et 1
+    ball1.nn.ni[1] = ball1.relativeSpeed(ball2) / (maxSpeed * 2) // la vitesse relative maximale entre deux individus est de 2 * maxspeed cela permet des valeurs entre -1 et 1
     ball1.nn.ni[2] = ball1.sexualityOf(ball2)
 
     ball1.nn.nh[0] = ball1.nn.ni[0] * ball1.nn.w[0][0] + ball1.nn.ni[1] * ball1.nn.w[1][0] + ball1.nn.ni[2] * ball1.nn.w[2][0]

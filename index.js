@@ -10,7 +10,7 @@ import { voroways, selectedPositions } from "./voroways/index.js";
 import { moveSpheres, checkCollisions, generateSphere, trainNetwork, death } from "./living-balls/index.js";
 
 // PARAMETERS
-const nbBalls = 50
+const nbBalls = 2
 
 // BASIC SETUP
 
@@ -123,12 +123,12 @@ scene.add(domeMesh)
 // scene.add(lUrban)
 
 // VOROWAYS - DIAGRAMME DE VORONOI
-voroways.position.y += .1
-scene.add(voroways)
+// voroways.position.y += .1
+// scene.add(voroways)
 
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION J'ESPERE
-// var spheres = []
-// for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+var spheres = []
+for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
 // console.log(spheres)
 
@@ -187,17 +187,18 @@ function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
     controls.update();
-    // moveSpheres(spheres)
-    // spheres = checkCollisions(spheres, scene);
+    moveSpheres(spheres)
+    spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
 
-    // spheres.map((ball, id) => {
-    //     if (ball.life <= 0) death(ball, id, scene, spheres)
-    //     ball.life--
-    //     ball.mesh.scale.y = ball.life*2/1500
-    // })
+    spheres.map((ball, id) => {
+        if (ball.life <= 0) death(ball, id, scene, spheres)
+        ball.life--;
+        ball.mesh.scale.y = ball.life * 2 / 1500
+    })
 
-    // if (spheres.length == 0) for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+    if (spheres.length == 0)
+        for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
     // snowflakes.map(sf => {
     //     sf.position.y -= .02
