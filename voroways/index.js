@@ -93,15 +93,12 @@ const logNormalRandom = () => {
     return Math.exp(mean + sigma * gaussianRandom())
 }
 
-const selectedPositions = []
 var vertices = d3.range(cells).map(function(d) {
     const angle = Math.random() * Math.PI * 2;
     const radius = Math.random() * 26;
     // console.log(gaussianRandom())
     const x = radius * Math.cos(angle)
     const y = radius * Math.sin(angle)
-        // console.log(x, y)
-    if (x < 20 && y < 20 && x > -20 && y > -20) selectedPositions.push([x, y])
     return [x, y];
 });
 
@@ -149,6 +146,14 @@ polygons.map(poly => {
     drawAllPlanes(points)
 })
 
+const selectedPositions = [];
+vertices.map(ver => {
+    const x = ver[0]
+    const y = ver[1]
+    if ((x >= -15 && x <= -5 || x >= 5 && x <= 15) && (y >= -15 && y <= -5 || y >= 5 && y <= 15)) {
+        selectedPositions.push([x, y]);
+    }
+})
 
 
 var lake = 0

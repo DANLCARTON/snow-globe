@@ -64,6 +64,10 @@ groundMesh.rotation.x = -Math.PI / 2
 groundMesh.position.y += 0.01
 scene.add(groundMesh)
 
+const repere = new THREE.SphereGeometry(1, 16)
+const repereMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, side: THREE.DoubleSide })
+const repereMesh = new THREE.Mesh(repere, repereMaterial)
+
 // DOME
 const dome = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
 const domeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, opacity: .3, transparent: true })
@@ -71,27 +75,33 @@ const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
 // CONWAY STRUCTURE - AUTOMATE CELLULAIRE
-// for (let i = 0; i < 3; i++) {
-//     const structure = conwayStructure.clone();
-//     structure.position.x = selectedPositions[i+20][0]-9;
-//     structure.position.z = selectedPositions[i+20][1]-9;
-//     structure.position.y += 50
+for (let i = 0; i < 2; i++) {
 
-//     const distanceToCenter = Math.sqrt(structure.position.x*structure.position.x + structure.position.z*structure.position.z)
+    console.log(selectedPositions)
 
-//     structure.scale.x *= .02
-//     structure.scale.y *= .02
-//     structure.scale.z *= .02
-//     structure.position.y -= 49
+    const structure = conwayStructure.clone();
+    structure.position.x = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][0]; // -9 parce que les structures ne sont pas centrées.
+    structure.position.z = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][1]; // -9 parce que les structures ne sont pas centrées.
 
-//     structure.scale.x *= 25 * (1-(distanceToCenter/26))
-//     structure.scale.y *= 25 * (1-(distanceToCenter/26))
-//     structure.scale.z *= 25 * (1-(distanceToCenter/26))
+    console.log(structure.position.x, structure.position.z)
 
-//     structure.position.y += 22 * (1-(distanceToCenter/26))
+    structure.position.y += 50
 
-//     scene.add(structure)
-// }
+    const distanceToCenter = Math.sqrt(structure.position.x * structure.position.x + structure.position.z * structure.position.z)
+
+    structure.scale.x *= .02
+    structure.scale.y *= .02
+    structure.scale.z *= .02
+    structure.position.y -= 49
+
+    structure.scale.x *= 25 * (1 - (distanceToCenter / 26))
+    structure.scale.y *= 25 * (1 - (distanceToCenter / 26))
+    structure.scale.z *= 25 * (1 - (distanceToCenter / 26))
+
+    structure.position.y += 22 * (1 - (distanceToCenter / 26))
+
+    scene.add(structure)
+}
 
 // FANCY SNOWFLAKES - FRACTALES
 // let snowflakes = []
@@ -123,12 +133,12 @@ scene.add(domeMesh)
 // scene.add(lUrban)
 
 // VOROWAYS - DIAGRAMME DE VORONOI
-// voroways.position.y += .1
-// scene.add(voroways)
+voroways.position.y += .1
+scene.add(voroways)
 
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION J'ESPERE
-var spheres = []
-for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+// var spheres = []
+// for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
 // console.log(spheres)
 
@@ -187,18 +197,18 @@ function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
     controls.update();
-    moveSpheres(spheres)
-    spheres = checkCollisions(spheres, scene);
+    // moveSpheres(spheres)
+    // spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
 
-    spheres.map((ball, id) => {
-        if (ball.life <= 0) death(ball, id, scene, spheres)
-        ball.life--;
-        ball.mesh.scale.y = ball.life * 2 / 1500
-    })
+    // spheres.map((ball, id) => {
+    //     if (ball.life <= 0) death(ball, id, scene, spheres)
+    //     ball.life--;
+    //     ball.mesh.scale.y = ball.life * 2 / 1500
+    // })
 
-    if (spheres.length == 0)
-        for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+    // if (spheres.length == 0)
+    //     for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
     // snowflakes.map(sf => {
     //     sf.position.y -= .02

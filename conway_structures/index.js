@@ -4,6 +4,32 @@ import models from "./models.js" // importation des modèles préfaits pour la s
 const model = "snowGlobePulsar"
 let gen = 50
 
+// SETUP
+
+const window = new THREE.TextureLoader().load("./assets/window")
+window.wrapS = THREE.RepeatWrapping;
+window.wrapT = THREE.RepeatWrapping;
+window.repeat.set(1, 1)
+
+const wall = new THREE.TextureLoader().load("./assets/wall")
+wall.wrapS = THREE.RepeatWrapping;
+wall.wrapT = THREE.RepeatWrapping;
+wall.repeat.set(1, 1)
+
+const roof = new THREE.TextureLoader().load("./assets/roof")
+roof.wrapS = THREE.RepeatWrapping;
+roof.wrapT = THREE.RepeatWrapping;
+roof.repeat.set(1, 1)
+
+const wallMaterial = [
+    new THREE.MeshPhongMaterial({ map: window }),
+    new THREE.MeshPhongMaterial({ map: wall }),
+    new THREE.MeshPhongMaterial({ map: roof }),
+    new THREE.MeshPhongMaterial({ color: 0x888888 }),
+    new THREE.MeshPhongMaterial({ map: wall }),
+    new THREE.MeshPhongMaterial({ map: wall })
+]
+
 // fonction permettant de supprimer les bords de chaque couche de la simulation parce que ça cause des problèmes. 
 const deleteBorders = (layer) => {
     let result = layer.map(row => row.slice());
@@ -130,7 +156,7 @@ layers.push(cubes) // on y met la couche initiale
 
 // création de la géométrie et du matériau pour tous les cubes
 const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshPhongMaterial({ color: 0xffffff })
+// const material = new THREE.MeshPhongMaterial({ color: 0xffffff })
 
 // on va générer ici toutes les couches
 if (gen == null) gen = 50; // si aucun paramètre du nombre de générations n'a été rentré, on part sur 50 comme valeur par défaut. 
@@ -144,7 +170,8 @@ layers.map((layer) => {
     for (let x = 0; x <= 49; x++) {
         for (let z = 0; z <= 49; z++) {
             if (layer[x][z] == 1) {
-                const cube = new THREE.Mesh(geometry, material)
+                const cube = new THREE.Mesh(geometry, wallMaterial)
+                cube.rotation.y += Math.PI / 2 * Math.floor(Math.random() * 4)
                 cube.position.set(x, y, z);
                 cube.castShadow = false;
                 cube.receiveShadow = false
