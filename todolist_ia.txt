@@ -1,6 +1,7 @@
 A FAIRE
 - Intégrer completement la Chaine de Markov
 - Structures différentes bâtiments (conway structures)
+- Peaufiner détails
 
 SI ON A LE TEMPS
 - donner un design particuler pour les persos
