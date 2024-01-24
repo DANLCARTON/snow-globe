@@ -10,7 +10,8 @@ import { voroways, selectedPositions } from "./voroways/index.js";
 import { moveSpheres, checkCollisions, generateSphere, trainNetwork, death } from "./living-balls/index.js";
 
 // PARAMETERS
-const nbBalls = 2
+const nbBalls = 20
+const nbSnowFlakes = 200
 
 // BASIC SETUP
 
@@ -75,37 +76,37 @@ const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
 // CONWAY STRUCTURE - AUTOMATE CELLULAIRE
-for (let i = 0; i < 2; i++) {
+// for (let i = 0; i < 2; i++) {
 
-    console.log(selectedPositions)
+//     console.log(selectedPositions)
 
-    const structure = conwayStructure.clone();
-    structure.position.x = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][0]; // -9 parce que les structures ne sont pas centrées.
-    structure.position.z = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][1]; // -9 parce que les structures ne sont pas centrées.
+//     const structure = conwayStructure.clone();
+//     structure.position.x = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][0]; // -9 parce que les structures ne sont pas centrées.
+//     structure.position.z = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][1]; // -9 parce que les structures ne sont pas centrées.
 
-    console.log(structure.position.x, structure.position.z)
+//     console.log(structure.position.x, structure.position.z)
 
-    structure.position.y += 50
+//     structure.position.y += 50
 
-    const distanceToCenter = Math.sqrt(structure.position.x * structure.position.x + structure.position.z * structure.position.z)
+//     const distanceToCenter = Math.sqrt(structure.position.x * structure.position.x + structure.position.z * structure.position.z)
 
-    structure.scale.x *= .02
-    structure.scale.y *= .02
-    structure.scale.z *= .02
-    structure.position.y -= 49
+//     structure.scale.x *= .02
+//     structure.scale.y *= .02
+//     structure.scale.z *= .02
+//     structure.position.y -= 49
 
-    structure.scale.x *= 25 * (1 - (distanceToCenter / 26))
-    structure.scale.y *= 25 * (1 - (distanceToCenter / 26))
-    structure.scale.z *= 25 * (1 - (distanceToCenter / 26))
+//     structure.scale.x *= 25 * (1 - (distanceToCenter / 26))
+//     structure.scale.y *= 25 * (1 - (distanceToCenter / 26))
+//     structure.scale.z *= 25 * (1 - (distanceToCenter / 26))
 
-    structure.position.y += 22 * (1 - (distanceToCenter / 26))
+//     structure.position.y += 22 * (1 - (distanceToCenter / 26))
 
-    scene.add(structure)
-}
+//     scene.add(structure)
+// }
 
 // FANCY SNOWFLAKES - FRACTALES
 // let snowflakes = []
-// for (let i = 0; i < 1; i++) { // snowflakes number here
+// for (let i = 0; i < nbSnowFlakes; i++) { // snowflakes number here
 //     const snowflake = fancySnowflake.clone()
 
 //     const angle = Math.random()* (2*Math.PI)
@@ -133,12 +134,12 @@ for (let i = 0; i < 2; i++) {
 // scene.add(lUrban)
 
 // VOROWAYS - DIAGRAMME DE VORONOI
-voroways.position.y += .1
-scene.add(voroways)
+// voroways.position.y += .1
+// scene.add(voroways)
 
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION J'ESPERE
-// var spheres = []
-// for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+var spheres = []
+for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
 // console.log(spheres)
 
@@ -197,18 +198,20 @@ function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
     controls.update();
-    // moveSpheres(spheres)
-    // spheres = checkCollisions(spheres, scene);
+    moveSpheres(spheres)
+    spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
 
-    // spheres.map((ball, id) => {
-    //     if (ball.life <= 0) death(ball, id, scene, spheres)
-    //     ball.life--;
-    //     ball.mesh.scale.y = ball.life * 2 / 1500
-    // })
+    spheres.map((ball, id) => {
+        if (ball.life <= 0) death(ball, id, scene, spheres)
+        ball.life--;
+        ball.mesh.scale.y = ball.life * 2 / 1500
+    })
 
-    // if (spheres.length == 0)
-    //     for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
+    console.log("👨‍👩‍👧‍👦 current population : ", spheres.length)
+
+    if (spheres.length == 0)
+        for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
     // snowflakes.map(sf => {
     //     sf.position.y -= .02

@@ -355,14 +355,126 @@ function NNchange(ball1, ball2) {
     ball1.nn.ni[1] = ball1.relativeSpeed(ball2) / (maxSpeed * 2) // la vitesse relative maximale entre deux individus est de 2 * maxspeed cela permet des valeurs entre -1 et 1
     ball1.nn.ni[2] = ball1.sexualityOf(ball2)
 
-    ball1.nn.nh[0] = ball1.nn.ni[0] * ball1.nn.w[0][0] + ball1.nn.ni[1] * ball1.nn.w[1][0] + ball1.nn.ni[2] * ball1.nn.w[2][0]
-    ball1.nn.nh[1] = ball1.nn.ni[0] * ball1.nn.w[0][1] + ball1.nn.ni[1] * ball1.nn.w[1][1] + ball1.nn.ni[2] * ball1.nn.w[2][1]
-    ball1.nn.nh[2] = ball1.nn.ni[0] * ball1.nn.w[0][2] + ball1.nn.ni[1] * ball1.nn.w[1][2] + ball1.nn.ni[2] * ball1.nn.w[2][2]
-    ball1.nn.nh[3] = ball1.nn.ni[0] * ball1.nn.w[0][3] + ball1.nn.ni[1] * ball1.nn.w[1][3] + ball1.nn.ni[2] * ball1.nn.w[2][3]
-    ball1.nn.nh[4] = ball1.nn.ni[0] * ball1.nn.w[0][4] + ball1.nn.ni[1] * ball1.nn.w[1][4] + ball1.nn.ni[2] * ball1.nn.w[2][4]
+    ball1.nn.nh[0] = 1/(1+Math.exp(ball1.nn.ni[0] * ball1.nn.w[0][0] + ball1.nn.ni[1] * ball1.nn.w[1][0] + ball1.nn.ni[2] * ball1.nn.w[2][0]))   
+    ball1.nn.nh[1] = 1/(1+Math.exp(ball1.nn.ni[0] * ball1.nn.w[0][1] + ball1.nn.ni[1] * ball1.nn.w[1][1] + ball1.nn.ni[2] * ball1.nn.w[2][1]))
+    ball1.nn.nh[2] = 1/(1+Math.exp(ball1.nn.ni[0] * ball1.nn.w[0][2] + ball1.nn.ni[1] * ball1.nn.w[1][2] + ball1.nn.ni[2] * ball1.nn.w[2][2]))
+    ball1.nn.nh[3] = 1/(1+Math.exp(ball1.nn.ni[0] * ball1.nn.w[0][3] + ball1.nn.ni[1] * ball1.nn.w[1][3] + ball1.nn.ni[2] * ball1.nn.w[2][3]))
+    ball1.nn.nh[4] = 1/(1+Math.exp(ball1.nn.ni[0] * ball1.nn.w[0][4] + ball1.nn.ni[1] * ball1.nn.w[1][4] + ball1.nn.ni[2] * ball1.nn.w[2][4]))
 
-    ball1.nn.no[0] = ball1.nn.nh[0] * ball1.nn.wh[0][0] + ball1.nn.nh[1] * ball1.nn.wh[1][0] * ball1.nn.nh[2] * ball1.nn.wh[2][0] + ball1.nn.nh[3] * ball1.nn.wh[3][0] + ball1.nn.nh[4] * ball1.nn.wh[4][0]
-    ball1.nn.no[1] = ball1.nn.nh[0] * ball1.nn.wh[0][1] + ball1.nn.nh[1] * ball1.nn.wh[1][1] * ball1.nn.nh[2] * ball1.nn.wh[2][1] + ball1.nn.nh[3] * ball1.nn.wh[3][1] + ball1.nn.nh[4] * ball1.nn.wh[4][1]
+    ball1.nn.no[0] = 1/(1+Math.exp(ball1.nn.nh[0] * ball1.nn.wh[0][0] + ball1.nn.nh[1] * ball1.nn.wh[1][0] * ball1.nn.nh[2] * ball1.nn.wh[2][0] + ball1.nn.nh[3] * ball1.nn.wh[3][0] + ball1.nn.nh[4] * ball1.nn.wh[4][0]))
+    ball1.nn.no[1] = 1/(1+Math.exp(ball1.nn.nh[0] * ball1.nn.wh[0][1] + ball1.nn.nh[1] * ball1.nn.wh[1][1] * ball1.nn.nh[2] * ball1.nn.wh[2][1] + ball1.nn.nh[3] * ball1.nn.wh[3][1] + ball1.nn.nh[4] * ball1.nn.wh[4][1]))
+
+    backPropagation(ball1)
+}
+
+function backPropagation(ball) {
+
+    // dnoi = oi * (1-oi) * (ti-oi) | output neuron
+    // dnhi = oi * (1-oi) * (S(dnok * whk)) | hidden neuron
+
+    // dwij = n*dj*oi
+
+    const io = ball.nn.ni
+    const oo = ball.nn.no
+    const ho = ball.nn.nh
+    const hw = ball.nn.wh
+
+    const eta = 0.1 // learning rate
+
+    let target = []
+
+    if (ball.nn.ni[0] < 0.5 && ball.nn.ni[1] < 0 && ball.nn.ni[2] == 1) { // cas d'un personnage se rapprochant d'une femelle
+        target = [1, 0] // on s'attend a ce que le personnage accélère et ne tourne plus
+        const error = [target[0]-oo[0], target[1]-oo[1]]
+    } else if (ball.nn.ni[0] < 0.5 && ball.nn.ni[1] > 0 && ball.nn.ni[2] == 1) { // cas d'un personnage s'éloignant d'une femelle
+        target = [-1, 1] // on s'attend à ce que le persommage ralentisse et tourne
+        const error = [target[0]-oo[0], target[1]-oo[1]]
+    } else if (ball.nn.ni[0] < 0.5 && ball.nn.ni[1] < 0 && ball.nn.ni[2] == -1) { // cas d'un personnage qui se rapproche d'un mâle
+        target = [-1, -1] // on s'attend à ce que le personnage ralentisse et tourne
+        const error = [target[0]-oo[0], target[1]-oo[1]]
+    } else { // dans tous les autres cas
+        target = [0, 0] // on s'attend à ce que le personnage continue à se déplacer comme avant
+        const error = [target[0]-oo[0], target[1]-oo[1]]
+    }
+
+    // modification des poids des neurones cachés (ceux qui vont vers les outputs)
+    const dno6 = oo[0] * (1-oo[0]) * (target[0]-oo[0]) // no 0
+    const dno7 = oo[1] * (1-oo[1]) * (target[0]-oo[1]) // no 1
+
+    // modification des poids des neurones d'entrée (ceux qui vont vers la couche cachée)
+    const dnh1 = ho[0] * (1-ho[0]) * ((dno6*hw[0][0]) + (dno7*hw[0][1])) // nh 0
+    const dnh2 = ho[1] * (1-ho[1]) * ((dno6*hw[1][0]) + (dno7*hw[1][1])) // nh 1
+    const dnh3 = ho[2] * (1-ho[2]) * ((dno6*hw[2][0]) + (dno7*hw[2][1])) // nh 2
+    const dnh4 = ho[3] * (1-ho[3]) * ((dno6*hw[3][0]) + (dno7*hw[3][1])) // nh 3
+    const dnh5 = ho[4] * (1-ho[4]) * ((dno6*hw[4][0]) + (dno7*hw[4][1])) // nh 4
+
+    // calcul des deltas
+    const dwno00 = eta * ho[0] * dno6 
+    const dwno01 = eta * ho[0] * dno7 
+
+    const dwno10 = eta * ho[1] * dno6
+    const dwno11 = eta * ho[1] * dno7
+
+    const dwno20 = eta * ho[2] * dno6
+    const dwno21 = eta * ho[2] * dno7
+
+    const dwno30 = eta * ho[3] * dno6
+    const dwno31 = eta * ho[3] * dno7
+
+    const dwno40 = eta * ho[4] * dno6
+    const dwno41 = eta * ho[4] * dno7
+
+    const dwnh00 = eta * io[0] * dnh1
+    const dwnh01 = eta * io[0] * dnh2
+    const dwnh02 = eta * io[0] * dnh3
+    const dwnh03 = eta * io[0] * dnh4
+    const dwnh04 = eta * io[0] * dnh5
+
+    const dwnh10 = eta * io[1] * dnh1
+    const dwnh11 = eta * io[1] * dnh2
+    const dwnh12 = eta * io[1] * dnh3
+    const dwnh13 = eta * io[1] * dnh4
+    const dwnh14 = eta * io[1] * dnh5
+
+    const dwnh20 = eta * io[2] * dnh1
+    const dwnh21 = eta * io[2] * dnh2
+    const dwnh22 = eta * io[2] * dnh3
+    const dwnh23 = eta * io[2] * dnh4
+    const dwnh24 = eta * io[2] * dnh5
+
+    // changement des poids
+    ball.nn.w[0][0] += dwnh00
+    ball.nn.w[0][1] += dwnh01
+    ball.nn.w[0][2] += dwnh02
+    ball.nn.w[0][3] += dwnh03
+    ball.nn.w[0][4] += dwnh04
+
+    ball.nn.w[1][0] += dwnh10
+    ball.nn.w[1][1] += dwnh11
+    ball.nn.w[1][2] += dwnh12
+    ball.nn.w[1][3] += dwnh13
+    ball.nn.w[1][4] += dwnh14
+
+    ball.nn.w[2][0] += dwnh20
+    ball.nn.w[2][1] += dwnh21
+    ball.nn.w[2][2] += dwnh22
+    ball.nn.w[2][3] += dwnh23
+    ball.nn.w[2][4] += dwnh24
+
+    ball.nn.wh[0][0] += dwno00
+    ball.nn.wh[0][1] += dwno01
+
+    ball.nn.wh[1][0] += dwno10
+    ball.nn.wh[1][1] += dwno11
+
+    ball.nn.wh[2][0] += dwno20
+    ball.nn.wh[2][1] += dwno21
+
+    ball.nn.wh[3][0] += dwno30
+    ball.nn.wh[3][1] += dwno31
+
+    ball.nn.wh[4][0] += dwno40
+    ball.nn.wh[4][1] += dwno41
 }
 
 
