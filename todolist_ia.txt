@@ -1,10 +1,8 @@
 A FAIRE
-- Textures
-- Intégrer la Chaine de Markov 
-- abandonner le système d'évolution actuel et le faire à la main parce que y'a rien qui va je crois
+- Intégrer completement la Chaine de Markov
 - Structures différentes bâtiments (conway structures)
 
 SI ON A LE TEMPS
 - donner un design particuler pour les persos
-- collisions avec les bâtiments
-- mettre des dorures sur le cylindre
+- collisions / refuge avec les bâtiments
+- mettre des dorures sur le base boule à neige
