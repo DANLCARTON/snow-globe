@@ -1,3 +1,6 @@
+// VOROWAYS - JE SAIS PLUS
+// GENERATION D'UN RESEAUDE ROUTES GRACE A UN DIAGRAMME DE VORONOI
+
 import * as THREE from "three"
 import * as d3 from "d3"
 import { OrbitControls } from 'OrbitControls'; // importation de l'addon Orbit Controls pour la gestion de la caméra
@@ -9,7 +12,7 @@ const nbVertices = 10
 const maxSize = 25
 const cells = 50
 
-// textures
+// Importation des textures
 const roadTexture = new THREE.TextureLoader().load("./assets/road")
 roadTexture.wrapS = THREE.RepeatWrapping
 roadTexture.wrapT = THREE.RepeatWrapping;
@@ -32,7 +35,6 @@ const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE
 
 // const urbanMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: urbanTexture })
 const urbanMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: urbanTexture })
-
 const lakeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: lakeTexture })
 
 // définition de la scene et de la caméra
@@ -50,23 +52,18 @@ const lakeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.
 
 let voroways = new THREE.Mesh()
 
-
-
-
-
-
 // FUCTIONS
 // ---------------------------------------------------------------
-const drawAllPlanes = (points) => {
+const drawAllPlanes = (points) => { // fonction qui permet de placer les plans reprénsetnatn les routes après que le diagramme soit généré
     for (let i = 1; i < points.length; i++) {
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-        const dx = points[i].x - points[i - 1].x;
+        const dx = points[i].x - points[i - 1].x; // on regarde où est le point de départ et où est le point d'arrivée de chaque plan
         const dz = points[i].z - points[i - 1].z;
         const dy = points[i].y - points[i - 1].y;
         const distance = Math.sqrt(dx * dx + dz * dz);
         const angleZ = Math.atan2(dz, dx);
         const angleY = Math.atan2(dy, dy);
-        plane.scale.set(distance, 1, 1);
+        plane.scale.set(distance, 1, 1); // On génère les caractéristiques du plan en fonction
         plane.position.set((points[i].x + points[i - 1].x) / 2, (points[i].y + points[i - 1].y) / 2, (points[i].z + points[i - 1].z) / 2);
         plane.rotation.z = angleZ;
         plane.rotation.y = angleY;
@@ -75,7 +72,7 @@ const drawAllPlanes = (points) => {
     }
 }
 
-const gaussianRandom = () => {
+const gaussianRandom = () => { // Différentes lois aléatoires pour placer les points permettant de créer le diagramme
     let u, v, s;
     do {
         u = Math.random() * 2 - 1; // Étend la plage à [-1, 1] pour la moyenne de 0.5
@@ -93,7 +90,7 @@ const logNormalRandom = () => {
     return Math.exp(mean + sigma * gaussianRandom())
 }
 
-var vertices = d3.range(cells).map(function(d) {
+var vertices = d3.range(cells).map(function(d) { // Utilisation de la bibliothèque D3.js générer les emplacement des points
     const angle = Math.random() * Math.PI * 2;
     const radius = Math.random() * 26;
     // console.log(gaussianRandom())
@@ -104,10 +101,9 @@ var vertices = d3.range(cells).map(function(d) {
 
 // console.log(selectedPositions)
 
-var delaunay = d3.Delaunay.from(vertices);
-// console.log(delaunay)
-const voronoi = delaunay.voronoi([-maxSize, -maxSize, maxSize, maxSize]);
-const polygons = Array.from(voronoi.cellPolygons());
+var delaunay = d3.Delaunay.from(vertices); 
+const voronoi = delaunay.voronoi([-maxSize, -maxSize, maxSize, maxSize]); // Utilisation de la bibliothèque D3.js pour générer le diagramme
+const polygons = Array.from(voronoi.cellPolygons()); // On récupère les informations des polygones
 
 // console.log(polygons);
 
@@ -124,7 +120,7 @@ const polygons = Array.from(voronoi.cellPolygons());
 
 // scene.add(object);
 
-const wholePolyInRadius = (poly) => {
+const wholePolyInRadius = (poly) => { // Fonction permettant de vérifier si un polygone est enntièrement dans un rayon défini
     const allPointsInRadius = poly.every(coord => {
         const distanceFromCenter = Math.sqrt((coord[0] - 0) ** 2 + (coord[1] - 0) ** 2);
         return distanceFromCenter < maxSize;
@@ -136,14 +132,14 @@ const wholePolyInRadius = (poly) => {
 // ----------------------------------------------------------------
 
 let mat = new THREE.LineBasicMaterial()
-polygons.map(poly => {
+polygons.map(poly => { // Pour chaque polygone du diagramme généré
     let points = []
-    if (wholePolyInRadius(poly)) {
+    if (wholePolyInRadius(poly)) { // Si il est entièrement dans le rayon
         poly.map(ver => {
-            points.push(new THREE.Vector3(ver[0], 0, ver[1]));
+            points.push(new THREE.Vector3(ver[0], 0, ver[1])); // on ajoute ses points à la liste des points
         })
     }
-    drawAllPlanes(points)
+    drawAllPlanes(points) // à partir de la liste des points, on pourra générer les plans formant les routes
 })
 
 const selectedPositions = [];
@@ -151,69 +147,32 @@ vertices.map(ver => {
     const x = ver[0]
     const y = ver[1]
     if ((x >= -15 && x <= -5 || x >= 5 && x <= 15) && (y >= -15 && y <= -5 || y >= 5 && y <= 15)) {
-        selectedPositions.push([x, y]);
+        selectedPositions.push([x, y]); // Selection de quelques positions pour placer les structres de conway (bâtiments) à cet emplacement
     }
 })
 
 
 var lake = 0
 
-polygons.map(poly => {
-    // console.log(poly)
-    // const polyPoints = []
-
-    // poly.map(coord => {
-    //     polyPoints.push(new THREE.Vector2(coord[0], coord[1]))
-    // })
-    // var polyShape = new THREE.Shape(polyPoints)
-    // const polyGeometry = new THREE.ShapeGeometry(polyShape)
-    // const polyMesh = new THREE.Mesh(polyGeometry, urbanMaterial)
-    // voroways.add(polyMesh)
-
-    // if (poly.index == 0) {
-    //     const polyGeometry = new THREE.BufferGeometry();
-
-    //     const vertices = [];
-
-    //     poly.map(coord => {
-    //         // console.log(coord)
-    //         vertices.push(coord[0], 0, coord[1]);
-    //     });
-
-    //     polyGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-    //     const polyMesh = new THREE.Mesh(polyGeometry, urbanMaterial);
-    //     polyMesh.position.y += 5
-    //     voroways.add(polyMesh);
-    // }
-
-    // if (poly.index == 0) {
-
+polygons.map(poly => { /// Pour chaque polygone du diagramme généré
     var polyPoints = []
-    if (wholePolyInRadius(poly)) {
+    if (wholePolyInRadius(poly)) { // Si il est entièrement dans le rayon
         poly.map(coord => {
             const distanceFromCenter = Math.sqrt((coord[0] - 0) * (coord[0] - 0) + (coord[1] - 0) * (coord[1] - 0))
-            if (distanceFromCenter < maxSize) polyPoints.push(new THREE.Vector2(coord[0], coord[1]))
+            if (distanceFromCenter < maxSize) polyPoints.push(new THREE.Vector2(coord[0], coord[1])) // On récupère les sommets du polygone
             else return
         })
-        var polyShape = new THREE.Shape(polyPoints)
-        var extrusionSettings = {
-            size: 30,
-            height: 4,
-            curveSegments: 3,
-            bevelThickness: 1,
-            bevelSize: 2,
-            bevelEnabled: false,
-            material: 0,
-            extrudeMaterial: 1
+        var polyShape = new THREE.Shape(polyPoints) // Des sommets on en fait une forme en 2D
+        var extrusionSettings = { // Paramètres pour l'extrusion
+            size: 30, height: 4, curveSegments: 3, bevelThickness: 1, bevelSize: 2, bevelEnabled: false, material: 0, extrudeMaterial: 1
         };
-        var polyGeometry = new THREE.ExtrudeGeometry(polyShape, extrusionSettings);
+        var polyGeometry = new THREE.ExtrudeGeometry(polyShape, extrusionSettings);// On l'extrude (cela permettra d'en faire un mesh)
 
         if (lake < 2) {
-            var poly = new THREE.Mesh(polyGeometry, lakeMaterial);
+            var poly = new THREE.Mesh(polyGeometry, lakeMaterial); // Les deux premières polygones seront des lacs
             lake++
         } else {
-            var poly = new THREE.Mesh(polyGeometry, urbanMaterial);
+            var poly = new THREE.Mesh(polyGeometry, urbanMaterial); // Les autres du sol pavé
         }
 
         poly.rotation.x += Math.PI / 2
@@ -221,34 +180,5 @@ polygons.map(poly => {
         voroways.add(poly);
     }
 })
-
-console.log(polygons[0])
-
-
-// const shape = new THREE.BoxGeometry(1, 1)
-// const material = new THREE.MeshBasicMaterial({ color: 0xffffff })
-// const mesh = new THREE.Mesh(shape, material)
-// scene.add(mesh)
-
-// ----------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-// LOOP
-
-// function animate() {
-//     requestAnimationFrame(animate);
-//     controls.update();
-//     renderer.render(scene, camera);
-// }
-
-// on applique des règles autant de fois qu'on a défini d'itérations 
-// animate();
 
 export { voroways, selectedPositions }

@@ -1,3 +1,6 @@
+// L-URBAN - L-SYSTEMS
+// GENERATION D'UN RESEAU DE ROUTES EN UTILISANT UN ALGORITHME DE LA TORTUE
+
 import * as THREE from "three"
 import { OrbitControls } from 'OrbitControls'; // importation de l'addon Orbit Controls pour la gestion de la caméra
 import { TrackballControls } from 'TrackballControls'; // importation de l'addon Orbit Controls pour la gestion de la caméra

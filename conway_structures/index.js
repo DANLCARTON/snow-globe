@@ -1,13 +1,17 @@
+// CONWAY STRUCTURES - AUTOMATE CELLULAIRE
+// GENERATION DE STRUCTURES VERTICALES BASÉES SUR LES GENERATIONS DU JEU DE LA VIE
+
 import * as THREE from 'three'; // importation de three.js
 import models from "./models.js" // importation des modèles préfaits pour la simulation
 
-const possibleModels = ["snowGlobePulsar", "snowGlobePentadecathlon", "snowGlobe4Blinkers", "snowGlobeDiehard"]
-const model1 = possibleModels[Math.floor(Math.random() * possibleModels.length)]
+const possibleModels = ["snowGlobePulsar", "snowGlobePentadecathlon", "snowGlobe4Blinkers", "snowGlobeDiehard"] // modèles utilisables
+const model1 = possibleModels[Math.floor(Math.random() * possibleModels.length)] // deux modèles seront choisis aléatoirement pour être affichés
 const model2 = possibleModels[Math.floor(Math.random() * possibleModels.length)]
-let gen = 50
+let gen = 50 // La simulation du jeu de la vie se fera sur 50 itérations
 
 // SETUP
 
+// Importation des textures
 const window = new THREE.TextureLoader().load("./assets/window")
 window.wrapS = THREE.RepeatWrapping;
 window.wrapT = THREE.RepeatWrapping;
@@ -23,6 +27,7 @@ roof.wrapS = THREE.RepeatWrapping;
 roof.wrapT = THREE.RepeatWrapping;
 roof.repeat.set(1, 1)
 
+// Définition du matériau pour les cubes de la structure
 const wallMaterial = [
     new THREE.MeshPhongMaterial({ map: window }),
     new THREE.MeshPhongMaterial({ map: wall }),
@@ -168,10 +173,11 @@ else if (model2 === "snowGlobeDiehard") cubes2 = models["snowGlobeDiehard"]
 // tableau dans lequel il y aura toutes les couches. 
 let layers1 = []
 let layers2 = []
+
 layers1.push(cubes1) // on y met la couche initiale
 layers2.push(cubes2) // on y met la couche initiale
 
-// création de la géométrie et du matériau pour tous les cubes
+// création de la géométrie pour tous les cubes
 const geometry = new THREE.BoxGeometry();
 // const material = new THREE.MeshPhongMaterial({ color: 0xffffff })
 
@@ -179,7 +185,7 @@ const geometry = new THREE.BoxGeometry();
 if (gen == null) gen = 50; // si aucun paramètre du nombre de générations n'a été rentré, on part sur 50 comme valeur par défaut.
 for (let i = 1; i <= gen; i++) {
     layers1.push(deleteBorders(generateNextLayer(layers1[i - 1]))) // on génère toutes les couches. En gros on fait tourner le code pour le jeu de la vie, sauf qu'on enregistre toutes les générations une par une dans le tableau layers
-    layers2.push(deleteBorders(generateNextLayer(layers2[i - 1]))) // on génère toutes les couches. En gros on fait tourner le code pour le jeu de la vie, sauf qu'on enregistre toutes les générations une par une dans le tableau layers
+    layers2.push(deleteBorders(generateNextLayer(layers2[i - 1]))) 
 }
 
 // code pour placer les cubes dans la scène.
@@ -220,4 +226,5 @@ layers2.map((layer) => {
 conwayStructure1.add(new THREE.AxesHelper(1))
 conwayStructure2.add(new THREE.AxesHelper(1))
 
+// Exportation des structures générées
 export { conwayStructure1, conwayStructure2 }
