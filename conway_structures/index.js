@@ -1,7 +1,9 @@
 import * as THREE from 'three'; // importation de three.js
 import models from "./models.js" // importation des modèles préfaits pour la simulation
 
-const model = "snowGlobePulsar"
+const possibleModels = ["snowGlobePulsar", "snowGlobePentadecathlon", "snowGlobe4Blinkers", "snowGlobeDiehard"]
+const model1 = possibleModels[Math.floor(Math.random() * possibleModels.length)]
+const model2 = possibleModels[Math.floor(Math.random() * possibleModels.length)]
 let gen = 50
 
 // SETUP
@@ -76,6 +78,7 @@ const countNeighbours = (x, z, cubes) => {
 
 // fonction pour générer la prochaine couche de cubes. Correspond à la prochaine génération de la simulation. 
 const generateNextLayer = (cubesLayer) => {
+    // console.log(cubesLayer)
     let nextLayer = []; // Création d'un nouveau tableau vide pour stocker la prochaine génération
 
     for (let i = 0; i < cubesLayer.length; i++) {
@@ -107,14 +110,26 @@ const generateNextLayer = (cubesLayer) => {
     }
     return nextLayer; // on retourne la prochaine couche. 
 }
-const conwayStructure = new THREE.Mesh()
-let cubes = []; // tableau qui va représenter la couche initiale, à partir de laquelle on va faire tourner la simulation. 
+const conwayStructure1 = new THREE.Mesh()
+const conwayStructure2 = new THREE.Mesh()
+let cubes1 = []; // tableau qui va représenter la couche initiale, à partir de laquelle on va faire tourner la simulation. 
+let cubes2 = []; // tableau qui va représenter la couche initiale, à partir de laquelle on va faire tourner la simulation. 
 
 // si on a rentré un modèle spécifique dans les paramèters de l'URL, on initie la première couche avec. voir models.js
 // if (model === "blincker") cubes = models["blincker"]
 // else if (model === "toad") cubes = models["toad"]
 // else if (model === "beacon") cubes = models["beacon"]
-if (model === "snowGlobePulsar") cubes = models["snowGlobePulsar"]
+if (model1 === "snowGlobePulsar") cubes1 = models["snowGlobePulsar"]
+else if (model1 === "snowGlobePentadecathlon") cubes1 = models["snowGlobePentadecathlon"]
+else if (model1 === "snowGlobe4Blinkers") cubes1 = models["snowGlobe4Blinkers"]
+else if (model1 === "snowGlobe44p5h2v0") cubes1 = models["snowGlobe44p5h2v0"]
+else if (model1 === "snowGlobeDiehard") cubes1 = models["snowGlobeDiehard"]
+
+if (model2 === "snowGlobePulsar") cubes2 = models["snowGlobePulsar"]
+else if (model2 === "snowGlobePentadecathlon") cubes2 = models["snowGlobePentadecathlon"]
+else if (model2 === "snowGlobe4Blinkers") cubes2 = models["snowGlobe4Blinkers"]
+else if (model2 === "snowGlobe44p5h2v0") cubes2 = models["snowGlobe44p5h2v0"]
+else if (model2 === "snowGlobeDiehard") cubes2 = models["snowGlobeDiehard"]
     // else if (model === "pulsar") cubes = models["pulsar"]
     // else if (model === "pentadecathlon") cubes = models["pentadecathlon"]
     // else if (model === "4blinckers") cubes = models["4blinckers"]
@@ -151,22 +166,25 @@ if (model === "snowGlobePulsar") cubes = models["snowGlobePulsar"]
 // }
 
 // tableau dans lequel il y aura toutes les couches. 
-let layers = []
-layers.push(cubes) // on y met la couche initiale
+let layers1 = []
+let layers2 = []
+layers1.push(cubes1) // on y met la couche initiale
+layers2.push(cubes2) // on y met la couche initiale
 
 // création de la géométrie et du matériau pour tous les cubes
 const geometry = new THREE.BoxGeometry();
 // const material = new THREE.MeshPhongMaterial({ color: 0xffffff })
 
 // on va générer ici toutes les couches
-if (gen == null) gen = 50; // si aucun paramètre du nombre de générations n'a été rentré, on part sur 50 comme valeur par défaut. 
+if (gen == null) gen = 50; // si aucun paramètre du nombre de générations n'a été rentré, on part sur 50 comme valeur par défaut.
 for (let i = 1; i <= gen; i++) {
-    layers.push(deleteBorders(generateNextLayer(layers[i - 1]))) // on génère toutes les couches. En gros on fait tourner le code pour le jeu de la vie, sauf qu'on enregistre toutes les générations une par une dans le tableau layers
+    layers1.push(deleteBorders(generateNextLayer(layers1[i - 1]))) // on génère toutes les couches. En gros on fait tourner le code pour le jeu de la vie, sauf qu'on enregistre toutes les générations une par une dans le tableau layers
+    layers2.push(deleteBorders(generateNextLayer(layers2[i - 1]))) // on génère toutes les couches. En gros on fait tourner le code pour le jeu de la vie, sauf qu'on enregistre toutes les générations une par une dans le tableau layers
 }
 
 // code pour placer les cubes dans la scène.
 let y = 0; // on part d'une hauteur de 0
-layers.map((layer) => {
+layers1.map((layer) => {
     for (let x = 0; x <= 49; x++) {
         for (let z = 0; z <= 49; z++) {
             if (layer[x][z] == 1) {
@@ -175,11 +193,28 @@ layers.map((layer) => {
                 cube.position.set(x, y, z);
                 cube.castShadow = false;
                 cube.receiveShadow = false
-                conwayStructure.add(cube)
+                conwayStructure1.add(cube)
             }
         }
     }
     y-- // et on déscend d'un cran a chaque boucle
 })
 
-export { conwayStructure }
+y = 0
+layers2.map((layer) => {
+    for (let x = 0; x <= 49; x++) {
+        for (let z = 0; z <= 49; z++) {
+            if (layer[x][z] == 1) {
+                const cube = new THREE.Mesh(geometry, wallMaterial)
+                cube.rotation.y += Math.PI / 2 * Math.floor(Math.random() * 4)
+                cube.position.set(x, y, z);
+                cube.castShadow = false;
+                cube.receiveShadow = false
+                conwayStructure2.add(cube)
+            }
+        }
+    }
+    y-- // et on déscend d'un cran a chaque boucle
+})
+
+export { conwayStructure1, conwayStructure2 }

@@ -1,6 +1,6 @@
 A FAIRE
-- Intégrer completement la Chaine de Markov
-- Structures différentes bâtiments (conway structures)
+- Textures
+- Intégrer la Chaine de Markov 
 - Peaufiner détails
 
 SI ON A LE TEMPS

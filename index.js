@@ -3,7 +3,7 @@ import { OrbitControls } from 'OrbitControls'; // importation de l'addon Orbit C
 import { TrackballControls } from 'TrackballControls'; // importation de l'addon Orbit Controls pour la gestion de la caméra
 import { FlyControls } from 'FlyControls';
 import { FirstPersonControls } from 'FirstPersonControls';
-import { conwayStructure } from './conway_structures/index.js'
+import { conwayStructure1, conwayStructure2  } from './conway_structures/index.js'
 import { fancySnowflake } from './fancy_snowflakes/index.js'
 import { lUrban } from "./l-urban/index.js";
 import { voroways, selectedPositions } from "./voroways/index.js";
@@ -34,6 +34,8 @@ scene.add(p1)
 const controls = new OrbitControls(camera, renderer.domElement);
 scene.add(camera)
 
+const conwayStructure = [conwayStructure1, conwayStructure2]
+
 
 
 
@@ -57,6 +59,11 @@ groundTexture.wrapS = THREE.RepeatWrapping
 groundTexture.wrapT = THREE.RepeatWrapping;
 groundTexture.repeat.set(13, 13)
 
+const skyTexture = new THREE.TextureLoader().load("./assets/1000_F_284271537_PzbhngzMZsPkDQHPVETFN6aXxsA9nF32")
+skyTexture.wrapS = THREE.RepeatWrapping
+skyTexture.wrapT = THREE.RepeatWrapping;
+skyTexture.repeat.set(1, 1)
+
 const ground = new THREE.CircleGeometry(26, 64)
 const groundMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: groundTexture })
 const groundMesh = new THREE.Mesh(ground, groundMaterial)
@@ -75,34 +82,40 @@ const domeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, opacity: .3,
 const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
-// CONWAY STRUCTURE - AUTOMATE CELLULAIRE
-// for (let i = 0; i < 2; i++) {
+// LOL SKYBOX
+const sky = new THREE.SphereGeometry(1000, 64)
+const skyMaterial = new THREE.MeshBasicMaterial({map: skyTexture, side: THREE.BackSide})
+const skyMesh = new THREE.Mesh(sky, skyMaterial)
+scene.add(skyMesh)
 
-//     console.log(selectedPositions)
+// // CONWAY STRUCTURE - AUTOMATE CELLULAIRE
+for (let i = 0; i < 2; i++) {
 
-//     const structure = conwayStructure.clone();
-//     structure.position.x = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][0]; // -9 parce que les structures ne sont pas centrées.
-//     structure.position.z = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][1]; // -9 parce que les structures ne sont pas centrées.
+    console.log(selectedPositions)
 
-//     console.log(structure.position.x, structure.position.z)
+    const structure = conwayStructure[i].clone();
+    structure.position.x = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][0]; // -9 parce que les structures ne sont pas centrées.
+    structure.position.z = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][1]; // -9 parce que les structures ne sont pas centrées.
 
-//     structure.position.y += 50
+    console.log(structure.position.x, structure.position.z)
 
-//     const distanceToCenter = Math.sqrt(structure.position.x * structure.position.x + structure.position.z * structure.position.z)
+    structure.position.y += 50
 
-//     structure.scale.x *= .02
-//     structure.scale.y *= .02
-//     structure.scale.z *= .02
-//     structure.position.y -= 49
+    const distanceToCenter = Math.sqrt(structure.position.x * structure.position.x + structure.position.z * structure.position.z)
 
-//     structure.scale.x *= 25 * (1 - (distanceToCenter / 26))
-//     structure.scale.y *= 25 * (1 - (distanceToCenter / 26))
-//     structure.scale.z *= 25 * (1 - (distanceToCenter / 26))
+    structure.scale.x *= .02
+    structure.scale.y *= .02
+    structure.scale.z *= .02
+    structure.position.y -= 49
 
-//     structure.position.y += 22 * (1 - (distanceToCenter / 26))
+    structure.scale.x *= 25 * (1 - (distanceToCenter / 26))
+    structure.scale.y *= 25 * (1 - (distanceToCenter / 26))
+    structure.scale.z *= 25 * (1 - (distanceToCenter / 26))
 
-//     scene.add(structure)
-// }
+    structure.position.y += 22 * (1 - (distanceToCenter / 26))
+
+    scene.add(structure)
+}
 
 // FANCY SNOWFLAKES - FRACTALES
 // let snowflakes = []
@@ -134,8 +147,8 @@ scene.add(domeMesh)
 // scene.add(lUrban)
 
 // VOROWAYS - DIAGRAMME DE VORONOI
-// voroways.position.y += .1
-// scene.add(voroways)
+voroways.position.y += .1
+scene.add(voroways)
 
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION J'ESPERE
 var spheres = []
@@ -208,7 +221,7 @@ function animate() {
         ball.mesh.scale.y = ball.life * 2 / 1500
     })
 
-    console.log("👨‍👩‍👧‍👦 current population : ", spheres.length)
+    // console.log("👨‍👩‍👧‍👦 current population : ", spheres.length)
 
     if (spheres.length == 0)
         for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
