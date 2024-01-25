@@ -325,12 +325,24 @@ const meet = (ball1, ball2, index1, index2, scene, spheres) => {
     }
 }
 
-function moveSpheres(spheres) {
+function moveSpheres(spheres, hitMeshs) {
     for (let i = 0; i < spheres.length; i++) {
         const ball = spheres[i];
         const speed = ball.speed / 10 + 0.01;
         ball.pos.x += Math.cos(ball.angle) * speed;
         ball.pos.z += Math.sin(ball.angle) * speed;
+
+        // // console.log(targetMeshs)
+        // hitMeshs.map(mesh => {
+        //     const meshCopy = mesh.clone()
+        //     meshCopy.position.y = 0
+        //     if (ball.mesh.position.distanceTo(meshCopy.position) < 5) {
+        //         // Collision détectée ! Fais quelque chose de super cool ici (´｡• ω •｡`) ♡
+        //         // console.log("Kya~! Collision avec le Mesh cible!");
+        //         let angle = Math.atan2(ball.pos.z, ball.pos.x)
+        //         ball.angle = angle + Math.PI + ((Math.random() - .5) / 2)
+        //     }
+        // })
 
         if (ball.pos.distanceTo(new THREE.Vector3(0, .2, 0)) > area) {
             let angle = Math.atan2(ball.pos.z, ball.pos.x)
@@ -516,102 +528,102 @@ function checkCollisions(spheres, scene) {
 
 
 
-// ENTRAINEMENT DU NN
+// // ENTRAINEMENT DU NN
 
-function NNForward(ball, inputs) {
-    ball.nn.ni[0] = inputs[0]
-    ball.nn.ni[1] = inputs[1]
-    ball.nn.ni[2] = inputs[2]
+// function NNForward(ball, inputs) {
+//     ball.nn.ni[0] = inputs[0]
+//     ball.nn.ni[1] = inputs[1]
+//     ball.nn.ni[2] = inputs[2]
 
-    for (let i = 0; i < ball.nn.nh.length; i++) {
-        ball.nn.nh[i] = 0;
-        for (let j = 0; j < ball.nn.ni.length; j++) {
-            ball.nn.nh[i] += ball.nn.ni[j] * ball.nn.w[j][i];
-        }
-        ball.nn.nh[i] = sigmoid(ball.nn.nh[i]); // Applique une fonction d'activation, par exemple sigmoid
-    }
+//     for (let i = 0; i < ball.nn.nh.length; i++) {
+//         ball.nn.nh[i] = 0;
+//         for (let j = 0; j < ball.nn.ni.length; j++) {
+//             ball.nn.nh[i] += ball.nn.ni[j] * ball.nn.w[j][i];
+//         }
+//         ball.nn.nh[i] = sigmoid(ball.nn.nh[i]); // Applique une fonction d'activation, par exemple sigmoid
+//     }
 
-    for (let i = 0; i < ball.nn.no.length; i++) {
-        ball.nn.no[i] = 0;
-        for (let j = 0; j < ball.nn.nh.length; j++) {
-            ball.nn.no[i] += ball.nn.nh[j] * ball.nn.wh[j][i];
-        }
-        ball.nn.no[i] = sigmoid(ball.nn.no[i]); // Applique une fonction d'activation, par exemple sigmoid
-    }
+//     for (let i = 0; i < ball.nn.no.length; i++) {
+//         ball.nn.no[i] = 0;
+//         for (let j = 0; j < ball.nn.nh.length; j++) {
+//             ball.nn.no[i] += ball.nn.nh[j] * ball.nn.wh[j][i];
+//         }
+//         ball.nn.no[i] = sigmoid(ball.nn.no[i]); // Applique une fonction d'activation, par exemple sigmoid
+//     }
 
-    return ball.nn.no
-}
+//     return ball.nn.no
+// }
 
-function sigmoid(x) {
-    return 1 / (1 + Math.exp(-x));
-}
-
-
-function NNBackward(ball, loss) {
-    // Rétropropagation du gradient pour ajuster les poids du réseau
-
-    // Calcul des gradients pour les poids entre les neurones de sortie et les neurones cachés
-    for (let i = 0; i < ball.nn.wh.length; i++) {
-        for (let j = 0; j < ball.nn.wh[i].length; j++) {
-            let delta = ball.nn.no[j] * (1 - ball.nn.no[j]) * loss; // Dérivée de la fonction d'activation
-            ball.nn.wh[i][j] -= ball.nn.nh[i] * delta;
-        }
-    }
-
-    // Calcul des gradients pour les poids entre les neurones d'entrée et les neurones caché
-    for (let i = 0; i < ball.nn.w.length; i++) {
-        for (let j = 0; j < ball.nn.w[i].length; j++) {
-            let sum = 0;
-            for (let k = 0; k < ball.nn.no.length; k++) {
-                sum += ball.nn.wh[j][k] * (ball.nn.no[k] * (1 - ball.nn.no[k]) * loss);
-            }
-            let delta = ball.nn.nh[j] * (1 - ball.nn.nh[j]) * sum; // Dérivée de la fonction d'activation
-            ball.nn.w[i][j] -= ball.nn.ni[i] * delta;
-        }
-    }
-}
-
-function trainNetwork(ball, inputs, expectedOutputs, learningRate) {
-    // Forward pass
-    let output = NNForward(ball, inputs);
-
-    // Calculate loss
-    let loss = calculateLoss(output, expectedOutputs);
-
-    // Backward pass
-    NNBackward(ball, loss);
-
-    // Update weights using gradient descent
-    updateWeights(ball, learningRate);
-}
-
-function calculateLoss(output, expected) {
-    // Calcul de la perte (loss), par exemple, erreur quadratique moyenne
-    let sum = 0;
-    for (let i = 0; i < output.length; i++) {
-        sum += Math.pow(output[i] - expected[i], 2);
-    }
-    return sum / output.length;
-}
-
-function updateWeights(ball, learningRate) {
-    // Mise à jour des poids du réseau en utilisant le gradient descent
-
-    // Mise à jour des poids entre les neurones d'entrée et les neurones cachés
-    for (let i = 0; i < ball.nn.w.length; i++) {
-        for (let j = 0; j < ball.nn.w[i].length; j++) {
-            ball.nn.w[i][j] -= learningRate * ball.nn.w[i][j];
-        }
-    }
-
-    // Mise à jour des poids entre les neurones de sortie et les neurones cachés
-    for (let i = 0; i < ball.nn.wh.length; i++) {
-        for (let j = 0; j < ball.nn.wh[i].length; j++) {
-            ball.nn.wh[i][j] -= learningRate * ball.nn.wh[i][j];
-        }
-    }
-}
+// function sigmoid(x) {
+//     return 1 / (1 + Math.exp(-x));
+// }
 
 
+// function NNBackward(ball, loss) {
+//     // Rétropropagation du gradient pour ajuster les poids du réseau
 
-export { moveSpheres, checkCollisions, generateSphere, trainNetwork, death }
+//     // Calcul des gradients pour les poids entre les neurones de sortie et les neurones cachés
+//     for (let i = 0; i < ball.nn.wh.length; i++) {
+//         for (let j = 0; j < ball.nn.wh[i].length; j++) {
+//             let delta = ball.nn.no[j] * (1 - ball.nn.no[j]) * loss; // Dérivée de la fonction d'activation
+//             ball.nn.wh[i][j] -= ball.nn.nh[i] * delta;
+//         }
+//     }
+
+//     // Calcul des gradients pour les poids entre les neurones d'entrée et les neurones caché
+//     for (let i = 0; i < ball.nn.w.length; i++) {
+//         for (let j = 0; j < ball.nn.w[i].length; j++) {
+//             let sum = 0;
+//             for (let k = 0; k < ball.nn.no.length; k++) {
+//                 sum += ball.nn.wh[j][k] * (ball.nn.no[k] * (1 - ball.nn.no[k]) * loss);
+//             }
+//             let delta = ball.nn.nh[j] * (1 - ball.nn.nh[j]) * sum; // Dérivée de la fonction d'activation
+//             ball.nn.w[i][j] -= ball.nn.ni[i] * delta;
+//         }
+//     }
+// }
+
+// function trainNetwork(ball, inputs, expectedOutputs, learningRate) {
+//     // Forward pass
+//     let output = NNForward(ball, inputs);
+
+//     // Calculate loss
+//     let loss = calculateLoss(output, expectedOutputs);
+
+//     // Backward pass
+//     NNBackward(ball, loss);
+
+//     // Update weights using gradient descent
+//     updateWeights(ball, learningRate);
+// }
+
+// function calculateLoss(output, expected) {
+//     // Calcul de la perte (loss), par exemple, erreur quadratique moyenne
+//     let sum = 0;
+//     for (let i = 0; i < output.length; i++) {
+//         sum += Math.pow(output[i] - expected[i], 2);
+//     }
+//     return sum / output.length;
+// }
+
+// function updateWeights(ball, learningRate) {
+//     // Mise à jour des poids du réseau en utilisant le gradient descent
+
+//     // Mise à jour des poids entre les neurones d'entrée et les neurones cachés
+//     for (let i = 0; i < ball.nn.w.length; i++) {
+//         for (let j = 0; j < ball.nn.w[i].length; j++) {
+//             ball.nn.w[i][j] -= learningRate * ball.nn.w[i][j];
+//         }
+//     }
+
+//     // Mise à jour des poids entre les neurones de sortie et les neurones cachés
+//     for (let i = 0; i < ball.nn.wh.length; i++) {
+//         for (let j = 0; j < ball.nn.wh[i].length; j++) {
+//             ball.nn.wh[i][j] -= learningRate * ball.nn.wh[i][j];
+//         }
+//     }
+// }
+
+
+
+export { moveSpheres, checkCollisions, generateSphere, death }

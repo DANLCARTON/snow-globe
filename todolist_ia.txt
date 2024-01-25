@@ -1,7 +1,7 @@
 A FAIRE
 - Textures
 - Intégrer la Chaine de Markov 
-- Peaufiner détails
+- Paufiner détails
 
 SI ON A LE TEMPS
 - donner un design particuler pour les persos
