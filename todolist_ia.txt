@@ -1,8 +1,9 @@
 A FAIRE
 - Textures
 - Intégrer la Chaine de Markov 
+- Paufiner détails
 
 SI ON A LE TEMPS
 - donner un design particuler pour les persos
-- collisions avec les bâtiments
-- mettre des dorures sur le cylindre
+- collisions / refuge avec les bâtiments
+- mettre des dorures sur le base boule à neige
