@@ -1,7 +1,6 @@
 A FAIRE
 - Textures
 - Intégrer la Chaine de Markov 
-- abandonner le système d'évolution actuel et le faire à la main parce que y'a rien qui va je crois
 - Structures différentes bâtiments (conway structures)
 
 SI ON A LE TEMPS
