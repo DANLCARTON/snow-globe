@@ -1,7 +1,6 @@
 A FAIRE
 - Textures
 - Intégrer la Chaine de Markov 
-- Structures différentes bâtiments (conway structures)
 
 SI ON A LE TEMPS
 - donner un design particuler pour les persos

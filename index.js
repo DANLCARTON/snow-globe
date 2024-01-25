@@ -7,10 +7,10 @@ import { conwayStructure1, conwayStructure2  } from './conway_structures/index.j
 import { fancySnowflake } from './fancy_snowflakes/index.js'
 import { lUrban } from "./l-urban/index.js";
 import { voroways, selectedPositions } from "./voroways/index.js";
-import { moveSpheres, checkCollisions, generateSphere, trainNetwork, death } from "./living-balls/index.js";
+import { moveSpheres, checkCollisions, generateSphere, death } from "./living-balls/index.js";
 
 // PARAMETERS
-const nbBalls = 20
+const nbBalls = 2
 const nbSnowFlakes = 200
 
 // BASIC SETUP
@@ -59,11 +59,6 @@ groundTexture.wrapS = THREE.RepeatWrapping
 groundTexture.wrapT = THREE.RepeatWrapping;
 groundTexture.repeat.set(13, 13)
 
-const skyTexture = new THREE.TextureLoader().load("./assets/1000_F_284271537_PzbhngzMZsPkDQHPVETFN6aXxsA9nF32")
-skyTexture.wrapS = THREE.RepeatWrapping
-skyTexture.wrapT = THREE.RepeatWrapping;
-skyTexture.repeat.set(1, 1)
-
 const ground = new THREE.CircleGeometry(26, 64)
 const groundMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: groundTexture })
 const groundMesh = new THREE.Mesh(ground, groundMaterial)
@@ -82,20 +77,18 @@ const domeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, opacity: .3,
 const domeMesh = new THREE.Mesh(dome, domeMaterial)
 scene.add(domeMesh)
 
-// LOL SKYBOX
-const sky = new THREE.SphereGeometry(1000, 64)
-const skyMaterial = new THREE.MeshBasicMaterial({map: skyTexture, side: THREE.BackSide})
-const skyMesh = new THREE.Mesh(sky, skyMaterial)
-scene.add(skyMesh)
-
 // // CONWAY STRUCTURE - AUTOMATE CELLULAIRE
-for (let i = 0; i < 2; i++) {
+
+let structuresCollisions = []
+for (let i = 0; i <= 2; i++) {
 
     console.log(selectedPositions)
 
-    const structure = conwayStructure[i].clone();
+    const structure = conwayStructure[i%2].clone();
+    structuresCollisions.push(structure)
     structure.position.x = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][0]; // -9 parce que les structures ne sont pas centrées.
     structure.position.z = selectedPositions[Math.floor(Math.random() * selectedPositions.length)][1]; // -9 parce que les structures ne sont pas centrées.
+    structure.rotation.y = Math.random()*2*Math.PI
 
     console.log(structure.position.x, structure.position.z)
 
@@ -211,7 +204,7 @@ function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
     controls.update();
-    moveSpheres(spheres)
+    moveSpheres(spheres, structuresCollisions)
     spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
 

@@ -217,4 +217,7 @@ layers2.map((layer) => {
     y-- // et on déscend d'un cran a chaque boucle
 })
 
+conwayStructure1.add(new THREE.AxesHelper(1))
+conwayStructure2.add(new THREE.AxesHelper(1))
+
 export { conwayStructure1, conwayStructure2 }
