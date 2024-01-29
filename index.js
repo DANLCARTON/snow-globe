@@ -12,6 +12,7 @@ import { moveSpheres, checkCollisions, generateSphere, trainNetwork, death } fro
 
 // PARAMETERS
 const nbBalls = 2
+const N = 200     // number snow flakes
 
 // BASIC SETUP
 
@@ -47,7 +48,6 @@ const base = new THREE.CylinderGeometry(26, 20, 5, 64)
 const baseMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide })
 const baseMesh = new THREE.Mesh(base, baseMaterial)
 baseMesh.receiveShadow = false;
-// groundMesh.rotation.x = -Math.PI / 2
 baseMesh.position.y -= 2.5
 scene.add(baseMesh)
 
@@ -105,27 +105,27 @@ const repereMesh = new THREE.Mesh(repere, repereMaterial)
 // }
 
 // FANCY SNOWFLAKES - FRACTALES
-// let snowflakes = []
-// for (let i = 0; i < 1; i++) { // snowflakes number here
-//     const snowflake = fancySnowflake.clone()
+let snowflakes = []
+for (let i = 0; i < N; i++) { // snowflakes number here
+    const snowflake = fancySnowflake.clone()
 
-//     const angle = Math.random()* (2*Math.PI)
+    const angle = Math.random()* (2*Math.PI)
 
-//     snowflake.position.x += Math.cos(angle)*(Math.random()*26)
-//     snowflake.position.z += Math.sin(angle)*(Math.random()*26)
-//     snowflake.position.y += Math.random() * Math.sqrt(620 - Math.pow(Math.sqrt(snowflake.position.x*snowflake.position.x + snowflake.position.z*snowflake.position.z), 2));
+    snowflake.position.x += Math.cos(angle)*(Math.random()*26)
+    snowflake.position.z += Math.sin(angle)*(Math.random()*26)
+    snowflake.position.y += Math.random() * Math.sqrt(620 - Math.pow(Math.sqrt(snowflake.position.x*snowflake.position.x + snowflake.position.z*snowflake.position.z), 2));
 
-//     snowflake.rotation.x += Math.random() * 100
-//     snowflake.rotation.z += Math.random() * 100
-//     snowflake.rotation.y += Math.random() * 100
+    snowflake.rotation.x += Math.random() * 100
+    snowflake.rotation.z += Math.random() * 100
+    snowflake.rotation.y += Math.random() * 100
 
-//     snowflake.scale.x = .3
-//     snowflake.scale.y = .3
-//     snowflake.scale.z = .3
+    snowflake.scale.x = .3
+    snowflake.scale.y = .3
+    snowflake.scale.z = .3
 
-//     snowflakes.push(snowflake)
-//     scene.add(snowflake)
-// }
+    snowflakes.push(snowflake)
+    scene.add(snowflake)
+}
 
 // // L-URBAN - ALGORITHME EN TORTUE
 // lUrban.scale.x = lUrban.scale.x/2
@@ -378,17 +378,17 @@ function changeState(currentState) {
 StateStart()
 
 // textures
-const blue_sky = new THREE.TextureLoader().load("./assets/ciel_bleu_nuageux")
+const blue_sky = new THREE.TextureLoader().load("./assets/ciel_bleu_360")
 blue_sky .wrapS = THREE.RepeatWrapping;
 blue_sky .wrapT = THREE.RepeatWrapping;
 blue_sky .repeat.set(1, 1)
 
-const gray_cloud = new THREE.TextureLoader().load("./assets/ciel_bleu_nuageux")
+const gray_cloud = new THREE.TextureLoader().load("./assets/ciel_gris_360")
 gray_cloud.wrapS = THREE.RepeatWrapping;
 gray_cloud.wrapT = THREE.RepeatWrapping;
 gray_cloud.repeat.set(1, 1)
 
-const black_cloud = new THREE.TextureLoader().load("./assets/ciel_bleu_nuageux")
+const black_cloud = new THREE.TextureLoader().load("./assets/ciel_noir_360")
 black_cloud.wrapS = THREE.RepeatWrapping;
 black_cloud.wrapT = THREE.RepeatWrapping;
 black_cloud.repeat.set(1, 1)
@@ -397,21 +397,34 @@ black_cloud.repeat.set(1, 1)
 const geometry1 = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
 const material1 = new THREE.MeshBasicMaterial({ color: 0xffffff, map: blue_sky, side: THREE.BackSide, opacity: 0, transparent: true});
 const cube1 = new THREE.Mesh(geometry1, material1);
-// cube1.position.y += 13
         
 
 // parallépipède rectangle gris
 const geometry2 = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
 const material2 = new THREE.MeshBasicMaterial({ color: 0xffffff, map: gray_cloud, side: THREE.BackSide, opacity: 0, transparent: true});
 const cube2 = new THREE.Mesh(geometry2, material2);
-// cube2.position.y += 13
 
 // parallépipède rectangle noir
 const geometry3 = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
 const material3 = new THREE.MeshBasicMaterial({ color: 0xffffff, map: black_cloud, side: THREE.BackSide, opacity: 0, transparent: true});
 const cube3 = new THREE.Mesh(geometry3, material3);
-// cube3.position.y += 13
 
+// rain
+const geometry4 = new THREE.CylinderGeometry(.1, .1, 3, 3)
+const material4 = new THREE.MeshBasicMaterial({ color: 0xffffff});
+const rain = new THREE.Mesh(geometry4, material4);
+
+const geometry5 = new THREE.BoxGeometry(0, 0, 0)
+const material5 = new THREE.MeshPhongMaterial({ opacity: 0, transparent: true});
+const nothing = new THREE.Mesh(geometry5, material5);
+
+let snowing = false;
+let raining = false;
+let clearWeather = false
+
+let rained = false
+let snowed = false
+let cleared = false
 
 // boucle de rendu
 let frame = 0
@@ -430,6 +443,7 @@ function animate() {
     moveSpheres(spheres)
     spheres = checkCollisions(spheres, scene);
     renderer.render(scene, camera);
+    // console.log(state)
 
     spheres.map((ball, id) => {
         if (ball.life <= 0) death(ball, id, scene, spheres)
@@ -440,31 +454,161 @@ function animate() {
     if (spheres.length == 0)
         for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
-    // snowflakes.map(sf => {
+    if (raining && !rained) {
+        snowflakes.forEach(sf => {
+            sf.add(rain.clone());
+        });
+        rained = true
+        snowed = false
+        cleared = false
+    } else if (snowing && !snowed) {
+        snowflakes.map(sf => {
+            sf.add(fancySnowflake.clone())
+        })
+        rained = false
+        snowed = true
+        cleared = false
+    } else if (clearWeather && !cleared) {
+        snowflakes.map(sf => {
+            sf.add(nothing.clone())
+        })
+        rained = false
+        snowed = false
+        cleared = true
+    } 
+
+    // console.log(snowflakes[0].children)
+
+    // console.log({"state": state, "raining": raining, "snowing": snowing, "rained": rained, "snowed": snowed})
+
+    if ((state == 5 && !raining || state == 7 && !raining) && !rained) {
+        snowflakes.map(sf => {
+            while (sf.children.length > 0) {
+                sf.remove(sf.children[0]);
+            }
+        })
+        raining = true
+        snowing = false
+        clearWeather = false
+    } else if ((state == 3) && !snowed) {
+        snowflakes.map(sf => {
+            while (sf.children.length > 0) {
+                sf.remove(sf.children[0]);
+            }
+        })
+        snowing = true
+        raining = false
+        clearWeather = false
+    } else if ((state == 1 || state == 2 || state == 4 || state == 6) && !cleared) {
+        snowflakes.map(sf => {
+            while (sf.children.length > 0) {
+                sf.remove(sf.children[0]);
+            }
+        })
+        snowing = false
+        raining = false
+        clearWeather = true
+    }
+
+    if ((frame % 20 == 0 && frame != 0 && raining) || (frame % 100 == 0 && frame != 0 && snowing)) {
+        for (let i = 0; i <= 1; i++) {
+            let sf = fancySnowflake.clone()
+            if (raining) {
+                while (sf.children.length > 0) {
+                    sf.remove(sf.children[0]);
+                }
+                sf.add(rain.clone());
+            } else if (clearWeather) {
+                while (sf.children.length > 0) {
+                    sf.remove(sf.children[0]);
+                }
+                sf.add(nothing.clone());
+            }   
+            sf.scale.x = .3
+            sf.scale.y = .3
+            sf.scale.z = .3
+            snowflakes.push(sf)
+            scene.add(sf)
+        }
+    }
+
+
+
+    // console.log(snowflakes)
+
+    snowflakes.map(sf => {
+        if (snowing) {
+            sf.position.y -= .02
+            sf.rotation.x += Math.random() * .02
+            sf.rotation.z += Math.random() * .02
+            sf.rotation.y += Math.random() * .02
+        } else if (raining) {
+            sf.position.y -= 1
+            sf.rotation.x = 0
+            sf.rotation.z = 0
+            sf.rotation.y = 0
+        }
+    //   if (snowing || raining){
     //     sf.position.y -= .02
     //     sf.rotation.x += Math.random() * .02
     //     sf.rotation.z += Math.random() * .02
     //     sf.rotation.y += Math.random() * .02
-    //     if (sf.position.y <= -.2) {
-    //         const angle = Math.random()* (2*Math.PI)
-    //         sf.position.x += Math.cos(angle)*(Math.random()*26)
-    //         sf.position.z += Math.sin(angle)*(Math.random()*26)
-    //         sf.position.y = Math.sqrt(620 - Math.pow(Math.sqrt(sf.position.x*sf.position.x + sf.position.z*sf.position.z), 2));
-    //     }
-    // })
+    //   }
+    //   else if (state !== 3 && snowing) {
+    //     snowing = false;  
+    //   }
+    //   else if (state !== 5 && raining) {
+    //     raining = false;
+    //   }
+    //   if (state === 3 && !snowing) {
+    //     snowing = true
+    //     console.log("snowing", snowing)
+    //   } 
+      
+    //   else if (state === 5 && !raining) {
+    //     raining = true;
+    //     sf.mesh = rain
+    //     console.log(raining)
+    //   } 
+      
+        if (sf.position.y <= -.2) {
+        //   if (state === 5 && !raining) {
+        //     raining = true;
+        //     sf.mesh = rain
+        //     console.log(raining)
+        //   } 
+            // console.log(sf)
+                // if (!snowing) {
+                //     while (sf.children.length > 0) {
+                //         sf.remove(sf.children[0]);
+                //     }
+                //     raining = true
+                //     snowing = false
+                // } 
+
+            const angle = Math.random()* (2*Math.PI)
+            sf.position.x += Math.cos(angle)*(Math.random()*26)
+            sf.position.z += Math.sin(angle)*(Math.random()*26)
+            sf.position.y = Math.sqrt(620 - Math.pow(Math.sqrt(sf.position.x*sf.position.x + sf.position.z*sf.position.z), 2));
+        }
+    })
 
     frame++
 
     if (frame % 180 == 0) {
         cubeState = changeState(state)
     }
+    
+    // console.log(frame)
+
+    // console.log(cubeState)
   
     if (cubeState !== undefined) {
         scene.add(cubeState.current)
-        cubeState.previous.material.opacity -= 0.01;
+        if (cubeState.previous !== undefined) cubeState.previous.material.opacity -= 0.01;
         cubeState.current.material.opacity += 0.01;
 
-        if (cubeState.previous.material.opacity <= 0) {
+        if (cubeState.previous !== undefined && cubeState.previous.material.opacity <= 0) { 
             scene.remove(cubeState.previous);
         }
         if (cubeState.current.material.opacity > 0.8) {
