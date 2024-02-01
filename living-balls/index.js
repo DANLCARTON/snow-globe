@@ -158,7 +158,7 @@ const generateSphere = (sex, attractiveness, strength, speed, scene, NN) => { //
     ball.mesh.castShadow = false;
     ball.mesh.receiveShadow = false;
 
-    ball.mesh.add(new THREE.AxesHelper(1))
+    // ball.mesh.add(new THREE.AxesHelper(1))
 
     scene.add(ball.mesh) // On ajoute le personnage à la scene
 
