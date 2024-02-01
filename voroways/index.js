@@ -37,19 +37,6 @@ const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE
 const urbanMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: urbanTexture })
 const lakeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: lakeTexture })
 
-// définition de la scene et de la caméra
-// const scene = new THREE.Scene();
-// const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1100000);
-// camera.position.y = 5
-// const renderer = new THREE.WebGLRenderer();
-// renderer.shadowMap.enabled = true;
-// renderer.shadowMap.type = THREE.PCFSoftShadowMap
-// renderer.setSize(window.innerWidth, window.innerHeight);
-// document.body.appendChild(renderer.domElement);
-// scene.add(new THREE.AmbientLight(0xd2b48c, 5))
-// const controls = new OrbitControls(camera, renderer.domElement);
-// scene.add(camera)
-
 let voroways = new THREE.Mesh()
 
 // FUCTIONS
@@ -104,21 +91,6 @@ var vertices = d3.range(cells).map(function(d) { // Utilisation de la bibliothè
 var delaunay = d3.Delaunay.from(vertices); 
 const voronoi = delaunay.voronoi([-maxSize, -maxSize, maxSize, maxSize]); // Utilisation de la bibliothèque D3.js pour générer le diagramme
 const polygons = Array.from(voronoi.cellPolygons()); // On récupère les informations des polygones
-
-// console.log(polygons);
-
-
-
-// geom.vertices.push(v1);
-// geom.vertices.push(v2);
-// geom.vertices.push(v3);
-
-// geom.faces.push( new THREE.Face3( 0, 1, 2 ) );
-// geom.computeFaceNormals();
-
-// var object = new THREE.Mesh( geom, new THREE.MeshNormalMaterial() );
-
-// scene.add(object);
 
 const wholePolyInRadius = (poly) => { // Fonction permettant de vérifier si un polygone est enntièrement dans un rayon défini
     const allPointsInRadius = poly.every(coord => {

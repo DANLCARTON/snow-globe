@@ -120,10 +120,6 @@ const conwayStructure2 = new THREE.Mesh()
 let cubes1 = []; // tableau qui va représenter la couche initiale, à partir de laquelle on va faire tourner la simulation. 
 let cubes2 = []; // tableau qui va représenter la couche initiale, à partir de laquelle on va faire tourner la simulation. 
 
-// si on a rentré un modèle spécifique dans les paramèters de l'URL, on initie la première couche avec. voir models.js
-// if (model === "blincker") cubes = models["blincker"]
-// else if (model === "toad") cubes = models["toad"]
-// else if (model === "beacon") cubes = models["beacon"]
 if (model1 === "snowGlobePulsar") cubes1 = models["snowGlobePulsar"]
 else if (model1 === "snowGlobePentadecathlon") cubes1 = models["snowGlobePentadecathlon"]
 else if (model1 === "snowGlobe4Blinkers") cubes1 = models["snowGlobe4Blinkers"]
@@ -135,40 +131,6 @@ else if (model2 === "snowGlobePentadecathlon") cubes2 = models["snowGlobePentade
 else if (model2 === "snowGlobe4Blinkers") cubes2 = models["snowGlobe4Blinkers"]
 else if (model2 === "snowGlobe44p5h2v0") cubes2 = models["snowGlobe44p5h2v0"]
 else if (model2 === "snowGlobeDiehard") cubes2 = models["snowGlobeDiehard"]
-    // else if (model === "pulsar") cubes = models["pulsar"]
-    // else if (model === "pentadecathlon") cubes = models["pentadecathlon"]
-    // else if (model === "4blinckers") cubes = models["4blinckers"]
-    // else if (model === "oscillators") cubes = models["oscillators"]
-    // else if (model === "block") cubes = models["block"]
-    // else if (model === "beehive") cubes = models["beehive"]
-    // else if (model === "loaf") cubes = models["loaf"]
-    // else if (model === "boat") cubes = models["boat"]
-    // else if (model === "tub") cubes = models["tub"]
-    // else if (model === "pond") cubes = models["pond"]
-    // else if (model === "cthulhu") cubes = models["cthulhu"]
-    // else if (model === "stills") cubes = models["stills"]
-    // else if (model === "glider") cubes = models["glider"]
-    // else if (model === "lwss") cubes = models["lwss"]
-    // else if (model === "mwss") cubes = models["mwss"]
-    // else if (model === "hwss") cubes = models["hwss"]
-    // else if (model === "44p5h2v0") cubes = models["44p5h2v0"]
-    // else if (model === "spaceships") cubes = models["spaceships"]
-    // else if (model === "rpentomino") cubes = models["rpentomino"]
-    // else if (model === "diehard") cubes = models["diehard"]
-    // else if (model === "acorn") cubes = models["acorn"]
-    // else if (model === "metuselahs") cubes = models["metuselahs"]
-
-// si aucun modèle spécifique n'a été rentré, on part sur une génération random. 
-// else {
-//     for (let i = 0; i <= 49; i++) {
-//         let row = [];
-//         for (let j = 0; j <= 49; j++) {
-//             if (Math.round(Math.random() * 8) == 1) row.push(1);
-//             else row.push(0)
-//         }
-//         cubes.push(row);
-//     }
-// }
 
 // tableau dans lequel il y aura toutes les couches. 
 let layers1 = []

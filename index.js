@@ -37,13 +37,8 @@ scene.add(camera)
 
 const conwayStructure = [conwayStructure1, conwayStructure2]
 
-
-
-
-
 // ACTUAL CODE
 // ----------------------------------------------------------------
-
 
 // SOCLE
 const base = new THREE.CylinderGeometry(26, 20, 5, 64)
@@ -59,6 +54,11 @@ groundTexture.wrapS = THREE.RepeatWrapping
 groundTexture.wrapT = THREE.RepeatWrapping;
 groundTexture.repeat.set(13, 13)
 
+const skyTexture = new THREE.TextureLoader().load("./assets/bg")
+skyTexture.wrapS = THREE.RepeatWrapping
+skyTexture.wrapT = THREE.RepeatWrapping;
+skyTexture.repeat.set(1, 1)
+
 const ground = new THREE.CircleGeometry(26, 64)
 const groundMaterial = new THREE.MeshPhongMaterial({side: THREE.DoubleSide, map: groundTexture })
 const groundMesh = new THREE.Mesh(ground, groundMaterial)
@@ -67,17 +67,10 @@ groundMesh.rotation.x = -Math.PI / 2
 groundMesh.position.y += 0.01
 scene.add(groundMesh)
 
-const repere = new THREE.SphereGeometry(1, 16)
-const repereMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, side: THREE.DoubleSide })
-const repereMesh = new THREE.Mesh(repere, repereMaterial)
-
-// scene.add(lLightning)
-
-// DOME
-// const dome = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
-// const domeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, opacity: .3, transparent: true })
-// const domeMesh = new THREE.Mesh(dome, domeMaterial)
-// scene.add(domeMesh)
+// const sky = new THREE.SphereGeometry(100000, 64)
+// const skyMaterial = new THREE.MeshBasicMaterial({side: THREE.BackSide, map: skyTexture })
+// const skyMesh = new THREE.Mesh(sky, skyMaterial)
+// scene.add(skyMesh)
 
 // // CONWAY STRUCTURE - AUTOMATE CELLULAIRE
 let structuresCollisions = []
@@ -132,12 +125,6 @@ for (let i = 0; i < nbSnowFlakes; i++) { // snowflakes number here
     scene.add(snowflake)
 }
 
-// // L-URBAN - ALGORITHME EN TORTUE
-// lUrban.scale.x = lUrban.scale.x/2
-// lUrban.scale.z = lUrban.scale.z/2
-// lUrban.position.y += .1
-// scene.add(lUrban)
-
 // VOROWAYS - DIAGRAMME DE VORONOI
 voroways.position.y += .1
 scene.add(voroways)
@@ -145,43 +132,6 @@ scene.add(voroways)
 // LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION
 var spheres = []
 for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
-
-// console.log(spheres)
-
-// // Utilisation de la fonction d 'entraînement
-// const trainingData = [{
-//         inputs: [0.5, -1.0, 1.0], // Un individu se rapprochant d'une femelle
-//         expectedOutputs: [1, 0], // Les sorties attendues selon ton objectif
-//     },
-//     {
-//         inputs: [0.5, 1.0, 1.0], // Un individu s'éloignant d'une femelle
-//         expectedOutputs: [.5, 1], // Les sorties attendues selon ton objectif
-//     },
-//     {
-//         inputs: [0.8, 0.5, -1.0], // deux mâles se rapprochent
-//         expectedOutputs: [.5, 1], // Les sorties attendues selon ton objectif
-//     },
-// ];
-
-// // Taux d'apprentissage
-// const learningRate = 0.00000001;
-
-// // Entraînement du réseau avec les scénarios définis
-
-// spheres.map(s => {
-//     console.log("Avant entraînement : ", s.nn);
-
-//     for (let epoch = 0; epoch < 1000000; epoch++) {
-//         for (let i = 0; i < trainingData.length; i++) {
-//             const example = trainingData[i];
-
-//             // Exécute la fonction d'entraînement avec l'exemple actuel
-//             trainNetwork(s, example.inputs, example.expectedOutputs, learningRate);
-//         }
-//     }
-
-//     console.log("Après entraînement : ", s.nn);
-// });
 
 // METEO - CHAINE DE MARKOV
 // FONCTIONS PERMETTANT DE FAIRE UNE METEO CHANGEANTE GRACE A UNE CHAINE DE MARKOV
@@ -349,17 +299,6 @@ function changeState(currentState) { // Fonction permettant de changer d'état
     console.log("to climat" + state)
 }
 
-// function fadeIn(cube) {
-//   scene.add(cube)
-//   if (cube.material.opacity < 1) cube.material.opacity += 0.1
-// }
-
-// function fadeOut(cube) {
-//   if (cube.material.opacity > 0) cube.material.opacity -= 0.1
-//   scene.remove(cube)
-// }
-
-
 // Simulation pour la météo
 StateStart()
 
@@ -417,10 +356,6 @@ let cleared = false // Variable permettant de sacoir si la neige et la pluie ont
 let frame = 0
 let cubeState = { previous: cube2, current: cube2 }
 
-// HELPERS
-// scene.add(new THREE.PointLightHelper(p1, 1))
-// scene.add(new THREE.AxesHelper(1))
-
 // LOOP
 
 let lightningEndFrame = 0 // Variable permettant de savoir quand faire disparaitre un éclair
@@ -459,10 +394,6 @@ function animate() {
         snowed = false
         cleared = true
     }
-
-    // console.log(snowflakes[0].children)
-
-    // console.log({"state": state, "raining": raining, "snowing": snowing, "rained": rained, "snowed": snowed})
 
     // Autres conditions permettant de changer ce qui tombe
     if ((state == 5 && !raining || state == 7 && !raining) && !rained) { // Dans le cas de la pluie
@@ -516,10 +447,6 @@ function animate() {
         }
     }
 
-
-
-    // console.log(snowflakes)
-
     snowflakes.map(sf => { // Boucle permettant de changer la manière de tomber
         if (snowing) {
             sf.position.y -= .02 // La neige descend de 0.02/frame
@@ -547,10 +474,6 @@ function animate() {
         cubeState = changeState(state)
     }
 
-    // console.log(frame)
-
-    // console.log(cubeState)
-
     if (cubeState !== undefined) { // Partie permettant de changer d'apparence du ciel
         scene.add(cubeState.current) 
         if (cubeState.previous !== undefined) cubeState.previous.material.opacity -= 0.01;
@@ -572,10 +495,6 @@ function animate() {
     if (frame == lightningEndFrame) { 
         scene.remove(lLightning) // on le fait disparaître
     }
-
-    // state = 7
-
 }
 
-// on applique des règles autant de fois qu'on a défini d'itérations 
 animate();

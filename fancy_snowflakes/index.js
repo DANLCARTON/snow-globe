@@ -46,8 +46,6 @@ const drawCubeAtPosition = (position, iter) => { // Ajout de 'iter' comme argume
     const nb = Math.floor(Math.random() * (URL_PROBA + (iter / 10))) // tire un nombre entre 0 et un nombre donné dans les paramètres avant. arrondi à l'unité inférieure
     if (nb == 0 || iter == 1) { // si le nombre tiré est = à 0 ou si on est à la première itération (pour éviter d'avoir un rendu vide)
         const cube = new THREE.Mesh(geometry, material) // on définit un nouveau mesh
-            // cube.castShadow = true; // il pourra générer des ombres
-            // cube.receiveShadow = true // il pourra recevoir des ombres
         cube.position.set(position.x, position.y, position.z) // il sera à la position donnée en paramètres
         cube.scale.set( // rétrécissement du mesh par rapport à chaque itération de manière à ce qu'il soient de plus en plus petits
             1 / Math.pow(URL_X, iter),
@@ -67,10 +65,6 @@ let materialProperties
 
 // if (URL_SHAPE == "cube") geometry = new THREE.BoxGeometry() // choix du type de mesh utilisé en fonction du paramètre rentré
 if (URL_SHAPE == "tetrahedron") geometry = new THREE.TetrahedronGeometry()
-    // else if (URL_SHAPE == "dodecahedron") geometry = new THREE.DodecahedronGeometry()
-    // else if (URL_SHAPE == "isocahedron") geometry = new THREE.IcosahedronGeometry()
-    // else if (URL_SHAPE == "octahedron") geometry = new THREE.OctahedronGeometry()
-    // else geometry = new THREE.BoxGeometry()
 
 if (URL_WIREFRAME) { // choix des paramètres du matériau (wireframes ou pas)
     materialProperties = {
