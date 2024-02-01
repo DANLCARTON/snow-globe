@@ -8,9 +8,10 @@ import { fancySnowflake } from './fancy_snowflakes/index.js'
 import { lUrban } from "./l-urban/index.js";
 import { voroways, selectedPositions } from "./voroways/index.js";
 import { moveSpheres, checkCollisions, generateSphere, death } from "./living-balls/index.js";
+import { lLightning } from "./l-lightning/index.js";
 
 // PARAMETERS
-const nbBalls = 2
+const nbBalls = 50
 const nbSnowFlakes = 200
 
 // BASIC SETUP
@@ -59,7 +60,7 @@ groundTexture.wrapT = THREE.RepeatWrapping;
 groundTexture.repeat.set(13, 13)
 
 const ground = new THREE.CircleGeometry(26, 64)
-const groundMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: groundTexture })
+const groundMaterial = new THREE.MeshPhongMaterial({side: THREE.DoubleSide, map: groundTexture })
 const groundMesh = new THREE.Mesh(ground, groundMaterial)
 groundMesh.receiveShadow = false;
 groundMesh.rotation.x = -Math.PI / 2
@@ -69,6 +70,8 @@ scene.add(groundMesh)
 const repere = new THREE.SphereGeometry(1, 16)
 const repereMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, side: THREE.DoubleSide })
 const repereMesh = new THREE.Mesh(repere, repereMaterial)
+
+// scene.add(lLightning)
 
 // DOME
 // const dome = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
@@ -425,6 +428,7 @@ scene.add(new THREE.AxesHelper(1))
 
 // LOOP
 
+let lightningEndFrame = 0
 function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
@@ -536,43 +540,8 @@ function animate() {
             sf.rotation.z = 0
             sf.rotation.y = 0
         }
-        //   if (snowing || raining){
-        //     sf.position.y -= .02
-        //     sf.rotation.x += Math.random() * .02
-        //     sf.rotation.z += Math.random() * .02
-        //     sf.rotation.y += Math.random() * .02
-        //   }
-        //   else if (state !== 3 && snowing) {
-        //     snowing = false;  
-        //   }
-        //   else if (state !== 5 && raining) {
-        //     raining = false;
-        //   }
-        //   if (state === 3 && !snowing) {
-        //     snowing = true
-        //     console.log("snowing", snowing)
-        //   } 
-
-        //   else if (state === 5 && !raining) {
-        //     raining = true;
-        //     sf.mesh = rain
-        //     console.log(raining)
-        //   } 
 
         if (sf.position.y <= -.2) {
-            //   if (state === 5 && !raining) {
-            //     raining = true;
-            //     sf.mesh = rain
-            //     console.log(raining)
-            //   } 
-            // console.log(sf)
-            // if (!snowing) {
-            //     while (sf.children.length > 0) {
-            //         sf.remove(sf.children[0]);
-            //     }
-            //     raining = true
-            //     snowing = false
-            // } 
 
             const angle = Math.random() * (2 * Math.PI)
             sf.position.x += Math.cos(angle) * (Math.random() * 26)
@@ -603,6 +572,18 @@ function animate() {
             cubeState.current.material.opacity = .8
         }
     }
+
+    console.log(state, frame, lightningEndFrame )
+    if (state == 7 && frame % 200 == 0) {
+        scene.add(lLightning)
+        lightningEndFrame = frame+10
+    } 
+    if (frame == lightningEndFrame) {
+        scene.remove(lLightning)
+    }
+
+    state = 7
+
 }
 
 // on applique des règles autant de fois qu'on a défini d'itérations 
