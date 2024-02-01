@@ -1,9 +1,3 @@
 A FAIRE
-- Textures
-- Intégrer la Chaine de Markov 
-- Paufiner détails
-
-SI ON A LE TEMPS
-- donner un design particuler pour les persos
-- collisions / refuge avec les bâtiments
-- mettre des dorures sur le base boule à neige
+- commenter le code
+- nettoyer le code (enlever toutes les grosses parties de code commentées dans les fichiers)
