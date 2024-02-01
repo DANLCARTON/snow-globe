@@ -324,18 +324,6 @@ function moveSpheres(spheres, hitMeshs) { // Fonction permettant aux personnages
         ball.pos.x += Math.cos(ball.angle) * speed;
         ball.pos.z += Math.sin(ball.angle) * speed;
 
-        // // console.log(targetMeshs)
-        // hitMeshs.map(mesh => {
-        //     const meshCopy = mesh.clone()
-        //     meshCopy.position.y = 0
-        //     if (ball.mesh.position.distanceTo(meshCopy.position) < 5) {
-        //         // Collision détectée ! Fais quelque chose de super cool ici (´｡• ω •｡`) ♡
-        //         // console.log("Kya~! Collision avec le Mesh cible!");
-        //         let angle = Math.atan2(ball.pos.z, ball.pos.x)
-        //         ball.angle = angle + Math.PI + ((Math.random() - .5) / 2)
-        //     }
-        // })
-
         if (ball.pos.distanceTo(new THREE.Vector3(0, .2, 0)) > area) { // Ils changent de direction s'ils arrivent à la limite
             let angle = Math.atan2(ball.pos.z, ball.pos.x)
             ball.angle = angle + Math.PI + ((Math.random() - .5) / 2)

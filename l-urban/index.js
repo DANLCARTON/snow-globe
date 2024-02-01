@@ -2,10 +2,6 @@
 // GENERATION D'UN RESEAU DE ROUTES EN UTILISANT UN ALGORITHME DE LA TORTUE
 
 import * as THREE from "three"
-import { OrbitControls } from 'OrbitControls'; // importation de l'addon Orbit Controls pour la gestion de la caméra
-import { TrackballControls } from 'TrackballControls'; // importation de l'addon Orbit Controls pour la gestion de la caméra
-import { FlyControls } from 'FlyControls';
-import { FirstPersonControls } from 'FirstPersonControls';
 import axioms from "./axioms.js"; // importation des axiomes déjà faits
 import { FRules, plusRules, minusRules, timesRules, divRules } from "./rules.js" // importation des réègles déjà faites
 
