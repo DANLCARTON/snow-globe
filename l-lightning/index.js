@@ -1,3 +1,6 @@
+// L-LIGHTNING - L-SYSTEM
+// CRÉATION D'UN ÉCLAIR D'ELECTRICITÉ EN UTILISANT DES FRACTALES
+
 import * as THREE from "three"
 import { OrbitControls } from 'OrbitControls'; // importation de l'addon Orbit Controls pour la gestion de la caméra
 import { TrackballControls } from 'TrackballControls'; // importation de l'addon Orbit Controls pour la gestion de la caméra
@@ -18,8 +21,9 @@ import { FirstPersonControls } from 'FirstPersonControls';
 // // lumières
 // scene.add(new THREE.AmbientLight(0xd2b48c, 5))
 
-let lLightning = new THREE.Mesh()
+let lLightning = new THREE.Mesh() // Création du mesh dans lequel sera stocké l'éclair
 
+// Création de la lumière générée par l'éclair sous la forme d'une lumière ponctuelle
 const light = new THREE.PointLight( 0x00ffff, 10000, 0 );
 light.position.set( 0, -30, 0 );
 lLightning.add( light );
@@ -27,12 +31,12 @@ lLightning.add( light );
 const pointLightHelper = new THREE.PointLightHelper( light, 1 );
 lLightning.add( pointLightHelper );
 
-    // définition des contrôles de la caméra
+// définition des contrôles de la caméra
 // const controls = new OrbitControls(camera, renderer.domElement);
 // scene.add(camera)
 
 // Senpai, let's make an l-system magic~
-const axiom = "F";
+const axiom = "F"; // Axiome de départ pour la génération du L-System
 let sentence = axiom;
 const rules = {
 //   "F": "FF[F-F-F][F+F+F][F/F/F][F*F*F]"
@@ -40,63 +44,54 @@ const rules = {
 //   "F": "F[+F]F[-F]F" // pas mal celui la
 //   "F": "FF+[+F-F-F]-[-F+F+F]*[*F/F/F]/[/F*F*F]"
 //   "F": "FF[F-F-F]F[*F/F+F]F"
-    "F": "FF[/F*F-F]F[*F/F+F]F" // choix
+    "F": "FF[/F*F-F]F[*F/F+F]F" // Règle qui sera appliquée pour générer l'axiome final
 };
 
-let length = .28;
-const generations = 3
+let length = .28; // Longeur des segments
+const generations = 3 // nombre de fois qu'il faudra appliquer la règle
+const angle = 30 // Angle entre chaque segment
 
-// Generer l-system
-function generate() {
-//   length *= 0.5; // Tu peux ajuster ça pour la longueur de chaque segment
-  const nextSentence = sentence.split('').reduce((acc, char) => {
-    return acc + (rules[char] || char);
-  }, "");
-
+function generate() { // Fonction permettant de générer le L-System
+  const nextSentence = sentence.split('').reduce((acc, char) => {return acc + (rules[char] || char);}, "");
   sentence = nextSentence;
-//   console.log(sentence)
-//   draw();
 }
 
-// Dessiner en 3D, nyaa~
-const angle = 30
 function draw(axiom) {
-    console.log(axiom)
+    // Définition des géométries et des matériaux pour l'éclair
     let geometry = new THREE.BufferGeometry();
     let material = new THREE.LineBasicMaterial({ color: 0xaaffff });
 
-    let vertices = [];
-    let stack = [];
-    let position = new THREE.Vector3(0, 0, 0);
-    let direction = new THREE.Vector3(0, -1, 0);
+    let vertices = []; // tableau dans lequel sera stocké les vertices composant l'éclair
+    let stack = []; // tableau permettant de stocker les positions et les angles de direction au moment de l'opération [
+    let position = new THREE.Vector3(0, 0, 0) // point de départ
+    let direction = new THREE.Vector3(0, -1, 0); // direction
 
     for (let i = 0; i < axiom.length; i++) {
         let current = axiom.charAt(i);
-
-        if (current === 'F') {
-            vertices.push(position.x, position.y, position.z);
-            position.add(direction.clone().multiplyScalar(length));
-        } else if (current === '+') {
-            direction.applyAxisAngle(new THREE.Vector3(0, 0, 1), THREE.MathUtils.degToRad(angle));
+        if (current === 'F') { // F
+            position.add(direction.clone().multiplyScalar(length)); // on avance
+            vertices.push(position.x, position.y, position.z); // et on stocke la nouvelle position dans le tableau de vertices
+        } else if (current === '+') { // +
+            direction.applyAxisAngle(new THREE.Vector3(0, 0, 1), THREE.MathUtils.degToRad(angle)); // on tourne dans une direction donnée
         } else if (current === '-') {
             direction.applyAxisAngle(new THREE.Vector3(0, 0, 1), -THREE.MathUtils.degToRad(angle));
         } else if (current === '*') {
             direction.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(angle));
         } else if (current === '/') {
             direction.applyAxisAngle(new THREE.Vector3(1, 0, 0), -THREE.MathUtils.degToRad(angle));
-        } else if (current === '[') {
-            stack.push({ position: position.clone(), direction: direction.clone() });
-        } else if (current === ']') {
+        } else if (current === '[') { // [
+            stack.push({ position: position.clone(), direction: direction.clone() }); // on stocke la position actuelle et l'angle dans le stack
+        } else if (current === ']') { // ]
             let state = stack.pop();
-            position.copy(state.position);
-            direction.copy(state.direction);
+            position.copy(state.position); // On récupère la position
+            direction.copy(state.direction); // Et l'angle depuis le stack
         }
     }
 
-    console.log(vertices)
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    let line = new THREE.Line(geometry, material);
-    lLightning.add(line);
+    // console.log(vertices)
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3)); // on stocke dans la géométrie les vertices créés
+    let line = new THREE.Line(geometry, material); // On génère le mesh
+    lLightning.add(line); // On l'ajoute
 }
 
 // Fonction pour faire tourner, desu~!
@@ -120,11 +115,12 @@ function draw(axiom) {
 
 // Senpai, let's animate this~!
 for (let i = 0; i < generations; i++) {
-    generate()
+    generate() 
 }
+// après avoir généré un axiome, on le dessine
 draw(sentence)
 
-lLightning.add(new THREE.AxesHelper())
+// lLightning.add(new THREE.AxesHelper())
 
 // function animate() {
 //   requestAnimationFrame(animate);
@@ -136,6 +132,6 @@ lLightning.add(new THREE.AxesHelper())
 
 // animate();
 
-lLightning.position.y += 26
+lLightning.position.y += 26 // On change sa position pour qu'il entre dans la boule à neige
 
 export {lLightning}

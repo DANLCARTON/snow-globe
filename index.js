@@ -142,7 +142,7 @@ for (let i = 0; i < nbSnowFlakes; i++) { // snowflakes number here
 voroways.position.y += .1
 scene.add(voroways)
 
-// LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION J'ESPERE
+// LIVING BALLS - BIOEVOLUTION et RESEAU DE NEURONES et NEUROEVOLUTION
 var spheres = []
 for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
@@ -183,20 +183,19 @@ for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0
 //     console.log("Après entraînement : ", s.nn);
 // });
 
+// METEO - CHAINE DE MARKOV
+// FONCTIONS PERMETTANT DE FAIRE UNE METEO CHANGEANTE GRACE A UNE CHAINE DE MARKOV
 
-// ----------------------------------------------------------------
-//          MARKOV CHAINE
-
-let state = 1
+let state = 1 // état de départ
 let firstStateDone = false
 
-function SunState() { // 1
-    scene.add(cube1)
-    const rand = Math.random()
+function SunState() { // Fonction permettant de changer d'état
+    scene.add(cube1) // on change le ciel qui doit s'afficher
+    const rand = Math.random() // On tire un nombre aléatoire
     console.log(`SunState probability : ${rand}`)
-    if (rand < 0.75) state = 1
-    else state = 2
-    if (!firstStateDone) cube1.material.opacity = 1
+    if (rand < 0.75) state = 1 // On tire aléatoirement un nouvel état parmi ceux possibles
+    else state = 2 // ici 1 ou 2
+    if (!firstStateDone) cube1.material.opacity = 1 
     firstStateDone = true
 }
 
@@ -276,11 +275,11 @@ function StateStart() {
         // state = 2
 }
 
-let currentCube
-let currentOpacity = 1
-let previousState = null;
+let currentCube // Variable permettant garder de coté le ciel affiché indépendament de l'état
+// let currentOpacity = 1
+let previousState = null; // Variable permettant de stocker l'état précédent au moment de changer
 
-function changeState(currentState) {
+function changeState(currentState) { // Fonction permettant de changer d'état
 
     console.log("from climat" + state)
 
@@ -328,23 +327,18 @@ function changeState(currentState) {
 
         // Changement de Cube
         if (currentState == 1) {
-            // SunState();
             previousCube = currentCube
             currentCube = cube1;
             cubeChanged = true
         } else if (currentState == 2 || currentState == 3) {
-            // GrayCloudState();
             previousCube = currentCube
             currentCube = cube2;
             cubeChanged = true
         } else if (currentState >= 4 && currentState <= 7) {
-            // BlackCloudState();
             previousCube = currentCube
             currentCube = cube3;
             cubeChanged = true
         }
-
-        // fadeIn(currentCube);  // Fondu entrant pour le nouveau cube
 
         previousState = currentState;
 
@@ -366,7 +360,7 @@ function changeState(currentState) {
 // }
 
 
-// Simulation 
+// Simulation pour la météo
 StateStart()
 
 // textures
@@ -385,85 +379,82 @@ black_cloud.wrapS = THREE.RepeatWrapping;
 black_cloud.wrapT = THREE.RepeatWrapping;
 black_cloud.repeat.set(1, 1)
 
-// parallépipède rectangle blue
+// mesh et matériau pour le ciel 1
 const geometry1 = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
 const material1 = new THREE.MeshBasicMaterial({ color: 0xffffff, map: blue_sky, side: THREE.BackSide, opacity: 0, transparent: true });
 const cube1 = new THREE.Mesh(geometry1, material1);
 
 
-// parallépipède rectangle gris
+// mesh et matériau pour le ciel 2
 const geometry2 = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
 const material2 = new THREE.MeshBasicMaterial({ color: 0xffffff, map: gray_cloud, side: THREE.BackSide, opacity: 0, transparent: true });
 const cube2 = new THREE.Mesh(geometry2, material2);
 
-// parallépipède rectangle noir
+// mesh et matériau pour le ciel 3
 const geometry3 = new THREE.SphereGeometry(26, 64, Math.round(64 / 4), 0, Math.PI * 2, 0, Math.PI * 0.5)
 const material3 = new THREE.MeshBasicMaterial({ color: 0xffffff, map: black_cloud, side: THREE.BackSide, opacity: 0, transparent: true });
 const cube3 = new THREE.Mesh(geometry3, material3);
 
-// rain
+// mesh et matériau pour les gouttes de pluie
 const geometry4 = new THREE.CylinderGeometry(.1, .1, 3, 3)
 const material4 = new THREE.MeshBasicMaterial({ color: 0xffffff });
 const rain = new THREE.Mesh(geometry4, material4);
 
+// Mesh vide pour quand il n'y ni pluie ni neige (que le temps est clair), cela permet de garder une continuité
 const geometry5 = new THREE.BoxGeometry(0, 0, 0)
 const material5 = new THREE.MeshPhongMaterial({ opacity: 0, transparent: true });
 const nothing = new THREE.Mesh(geometry5, material5);
 
-let snowing = false;
-let raining = false;
-let clearWeather = false
+let snowing = false; // Variable permettant de savoir s'il neige
+let raining = false; // Variable permettant de savoir s'il pleut
+let clearWeather = false // Variable permettant de savoir si le temps est clair
 
-let rained = false
-let snowed = false
-let cleared = false
+let rained = false // Variable permettant de savoir si la pluie est apparue
+let snowed = false // Variable permettant de sacoir si la neige est apparue
+let cleared = false // Variable permettant de sacoir si la neige et la pluie ont disparu
 
 // boucle de rendu
 let frame = 0
 let cubeState = { previous: cube2, current: cube2 }
 
 // HELPERS
-scene.add(new THREE.PointLightHelper(p1, 1))
-scene.add(new THREE.AxesHelper(1))
+// scene.add(new THREE.PointLightHelper(p1, 1))
+// scene.add(new THREE.AxesHelper(1))
 
 // LOOP
 
-let lightningEndFrame = 0
+let lightningEndFrame = 0 // Variable permettant de savoir quand faire disparaitre un éclair
 function animate() {
     // console.log(spheres)
     requestAnimationFrame(animate);
     controls.update();
-    moveSpheres(spheres, structuresCollisions)
-    spheres = checkCollisions(spheres, scene);
+
+    moveSpheres(spheres, structuresCollisions) // Fonction permettant de faire se déplacer les personnages
+    spheres = checkCollisions(spheres, scene); // Fonction permettant de savoir quoi faire quand des personnages se croisent
+
     renderer.render(scene, camera);
 
-    spheres.map((ball, id) => {
-        if (ball.life <= 0) death(ball, id, scene, spheres)
-        ball.life--;
-        ball.mesh.scale.y = ball.life * 2 / 1500
+    spheres.map((ball, id) => { // À chaque frame 
+        if (ball.life <= 0) death(ball, id, scene, spheres) // Si un personnage n'a plus de PV, il meurt
+        ball.life--; // sinon il perd 1 PV
+        ball.mesh.scale.y = ball.life * 2 / 1500 // Son échelle dépend du nombre de PV qui lui reste
     })
 
-    if (spheres.length == 0)
+    if (spheres.length == 0) // Si il n'y a plus de personnage dans la scene, il en respawn un certain nombre
         for (let i = 0; i < nbBalls; i++) spheres.push(generateSphere(Math.random() <= 0.5 ? "M" : "F", Math.random(), Math.random(), Math.random(), scene))
 
-    if (raining && !rained) {
-        snowflakes.forEach(sf => {
-            sf.add(rain.clone());
-        });
-        rained = true
+    if (raining && !rained) { // Conditions permettant de changer ce qui tombe, ici dans le cas de la pluie
+        snowflakes.forEach(sf => {sf.add(rain.clone());}); // On change tout les éléments qui n'ont à ce moment plus de mesh associé par des gouttes de pluie
+        rained = true // On change toutes les variables permettant de savoir la météo actuelle
         snowed = false
         cleared = false
     } else if (snowing && !snowed) {
-        snowflakes.map(sf => {
-            sf.add(fancySnowflake.clone())
-        })
+        snowflakes.map(sf => {sf.add(fancySnowflake.clone())})
         rained = false
         snowed = true
         cleared = false
     } else if (clearWeather && !cleared) {
-        snowflakes.map(sf => {
-            sf.add(nothing.clone())
-        })
+        snowflakes.map(sf => {sf.add(nothing.clone())})
         rained = false
         snowed = false
         cleared = true
@@ -473,13 +464,14 @@ function animate() {
 
     // console.log({"state": state, "raining": raining, "snowing": snowing, "rained": rained, "snowed": snowed})
 
-    if ((state == 5 && !raining || state == 7 && !raining) && !rained) {
-        snowflakes.map(sf => {
+    // Autres conditions permettant de changer ce qui tombe
+    if ((state == 5 && !raining || state == 7 && !raining) && !rained) { // Dans le cas de la pluie
+        snowflakes.map(sf => { // On retire à tout ce qui tombe leurs meshs
             while (sf.children.length > 0) {
                 sf.remove(sf.children[0]);
             }
         })
-        raining = true
+        raining = true // On change toutes les variables permettant de savoir les changements de météo
         snowing = false
         clearWeather = false
     } else if ((state == 3) && !snowed) {
@@ -528,21 +520,20 @@ function animate() {
 
     // console.log(snowflakes)
 
-    snowflakes.map(sf => {
+    snowflakes.map(sf => { // Boucle permettant de changer la manière de tomber
         if (snowing) {
-            sf.position.y -= .02
-            sf.rotation.x += Math.random() * .02
+            sf.position.y -= .02 // La neige descend de 0.02/frame
+            sf.rotation.x += Math.random() * .02 // Et tourne légèrement sur lui-même
             sf.rotation.z += Math.random() * .02
             sf.rotation.y += Math.random() * .02
         } else if (raining) {
-            sf.position.y -= 1
-            sf.rotation.x = 0
+            sf.position.y -= 1 // La pluie descend de 1/frame
+            sf.rotation.x = 0 // est tombe droite
             sf.rotation.z = 0
             sf.rotation.y = 0
         }
 
-        if (sf.position.y <= -.2) {
-
+        if (sf.position.y <= -.2) { // si les éléments tombent au sol, ils retournent en haut
             const angle = Math.random() * (2 * Math.PI)
             sf.position.x += Math.cos(angle) * (Math.random() * 26)
             sf.position.z += Math.sin(angle) * (Math.random() * 26)
@@ -550,9 +541,9 @@ function animate() {
         }
     })
 
-    frame++
+    frame++ // compteur de frames
 
-    if (frame % 180 == 0) {
+    if (frame % 80 == 0) { // On essaye de changer d'état toute les 80 frames
         cubeState = changeState(state)
     }
 
@@ -560,10 +551,10 @@ function animate() {
 
     // console.log(cubeState)
 
-    if (cubeState !== undefined) {
-        scene.add(cubeState.current)
+    if (cubeState !== undefined) { // Partie permettant de changer d'apparence du ciel
+        scene.add(cubeState.current) 
         if (cubeState.previous !== undefined) cubeState.previous.material.opacity -= 0.01;
-        cubeState.current.material.opacity += 0.01;
+        cubeState.current.material.opacity += 0.01; // via un fondu fade-out → fade-in
 
         if (cubeState.previous !== undefined && cubeState.previous.material.opacity <= 0) {
             scene.remove(cubeState.previous);
@@ -573,16 +564,16 @@ function animate() {
         }
     }
 
-    console.log(state, frame, lightningEndFrame )
-    if (state == 7 && frame % 200 == 0) {
-        scene.add(lLightning)
-        lightningEndFrame = frame+10
+    // console.log(state, frame, lightningEndFrame )
+    if ((state == 7 || state == 6) && frame % 200 == 0) { // pendant un état où il y a de la foudre
+        scene.add(lLightning) // on ajoute un éclair
+        lightningEndFrame = frame+10 // et 10 frames plus tard
     } 
-    if (frame == lightningEndFrame) {
-        scene.remove(lLightning)
+    if (frame == lightningEndFrame) { 
+        scene.remove(lLightning) // on le fait disparaître
     }
 
-    state = 7
+    // state = 7
 
 }
 
